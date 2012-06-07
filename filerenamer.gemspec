@@ -28,6 +28,7 @@ Gem::Specification.new do |s|
     "bin/filenameNumber",
     "bin/filenameRegulate",
     "bin/renamer",
+    "filerenamer.gemspec",
     "lib/filerenamer.rb",
     "lib/filerenamer/filerenamer.rb",
     "lib/filerenamer/filerenameroptionparser.rb",
