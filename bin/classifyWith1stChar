@@ -1,0 +1,124 @@
+#! /usr/bin/env ruby
+# coding: utf-8
+
+require "filerenamer/filerenamer.rb"
+require "filerenamer/filerenameroptionparser.rb"
+
+OPTIONS = {}
+op = FileRenamerOptionParser.new
+op.parse!(ARGV)
+files = ARGV
+
+fr = FileRenamer.new(op.options)
+fr.execute(files) do |filename|
+	char = filename[0]
+	case char
+	when /[a-z0-9]/
+		newname = "#{char}/#{filename}"
+	when /[A-Z]/
+		newname = "#{char.downcase}/#{filename}"
+	when "が"; newname = "か/#{filename}";
+	when "ぎ"; newname = "き/#{filename}";
+	when "ぐ"; newname = "く/#{filename}";
+	when "げ"; newname = "け/#{filename}";
+	when "ご"; newname = "こ/#{filename}";
+	when "ざ"; newname = "さ/#{filename}";
+	when "じ"; newname = "し/#{filename}";
+	when "ず"; newname = "す/#{filename}";
+	when "ぜ"; newname = "せ/#{filename}";
+	when "ぞ"; newname = "そ/#{filename}";
+	when "だ"; newname = "た/#{filename}";
+	when "ぢ"; newname = "ち/#{filename}";
+	when "づ"; newname = "つ/#{filename}";
+	when "で"; newname = "て/#{filename}";
+	when "ど"; newname = "と/#{filename}";
+	when "ば"; newname = "は/#{filename}";
+	when "び"; newname = "ひ/#{filename}";
+	when "ぶ"; newname = "ふ/#{filename}";
+	when "べ"; newname = "へ/#{filename}";
+	when "ぼ"; newname = "ほ/#{filename}";
+	when "ぱ"; newname = "は/#{filename}";
+	when "ぴ"; newname = "ひ/#{filename}";
+	when "ぷ"; newname = "ふ/#{filename}";
+	when "ぺ"; newname = "へ/#{filename}";
+	when "ぽ"; newname = "ほ/#{filename}";
+	when /[あ-ん]/
+		newname = "#{char}/#{filename}"
+
+	when "ガ"; newname = "か/#{filename}";
+	when "ギ"; newname = "き/#{filename}";
+	when "グ"; newname = "く/#{filename}";
+	when "ゲ"; newname = "け/#{filename}";
+	when "ゴ"; newname = "こ/#{filename}";
+	when "ザ"; newname = "さ/#{filename}";
+	when "ジ"; newname = "し/#{filename}";
+	when "ズ"; newname = "す/#{filename}";
+	when "ゼ"; newname = "せ/#{filename}";
+	when "ゾ"; newname = "そ/#{filename}";
+	when "ダ"; newname = "た/#{filename}";
+	when "ヂ"; newname = "ち/#{filename}";
+	when "ヅ"; newname = "つ/#{filename}";
+	when "デ"; newname = "て/#{filename}";
+	when "ド"; newname = "と/#{filename}";
+	when "バ"; newname = "は/#{filename}";
+	when "ビ"; newname = "ひ/#{filename}";
+	when "ブ"; newname = "ふ/#{filename}";
+	when "ベ"; newname = "へ/#{filename}";
+	when "ボ"; newname = "ほ/#{filename}";
+	when "パ"; newname = "は/#{filename}";
+	when "ピ"; newname = "ひ/#{filename}";
+	when "プ"; newname = "ふ/#{filename}";
+	when "ペ"; newname = "へ/#{filename}";
+	when "ポ"; newname = "ほ/#{filename}";
+	when "ヴ"; newname = "う/#{filename}";
+
+	when "ア"; newname = "あ/#{filename}";
+	when "イ"; newname = "い/#{filename}";
+	when "ウ"; newname = "う/#{filename}";
+	when "エ"; newname = "え/#{filename}";
+	when "オ"; newname = "お/#{filename}";
+	when "カ"; newname = "か/#{filename}";
+	when "キ"; newname = "き/#{filename}";
+	when "ク"; newname = "く/#{filename}";
+	when "ケ"; newname = "け/#{filename}";
+	when "コ"; newname = "こ/#{filename}";
+	when "サ"; newname = "さ/#{filename}";
+	when "シ"; newname = "し/#{filename}";
+	when "ス"; newname = "す/#{filename}";
+	when "セ"; newname = "せ/#{filename}";
+	when "ソ"; newname = "そ/#{filename}";
+	when "タ"; newname = "た/#{filename}";
+	when "チ"; newname = "ち/#{filename}";
+	when "ツ"; newname = "つ/#{filename}";
+	when "テ"; newname = "て/#{filename}";
+	when "ト"; newname = "と/#{filename}";
+	when "ナ"; newname = "な/#{filename}";
+	when "ニ"; newname = "に/#{filename}";
+	when "ヌ"; newname = "ぬ/#{filename}";
+	when "ネ"; newname = "ね/#{filename}";
+	when "ノ"; newname = "の/#{filename}";
+	when "ハ"; newname = "は/#{filename}";
+	when "ヒ"; newname = "ひ/#{filename}";
+	when "フ"; newname = "ふ/#{filename}";
+	when "ヘ"; newname = "へ/#{filename}";
+	when "ホ"; newname = "ほ/#{filename}";
+	when "マ"; newname = "ま/#{filename}";
+	when "ミ"; newname = "み/#{filename}";
+	when "ム"; newname = "む/#{filename}";
+	when "メ"; newname = "め/#{filename}";
+	when "モ"; newname = "も/#{filename}";
+	when "ヤ"; newname = "や/#{filename}";
+	when "ユ"; newname = "ゆ/#{filename}";
+	when "ヨ"; newname = "よ/#{filename}";
+	when "ラ"; newname = "ら/#{filename}";
+	when "リ"; newname = "り/#{filename}";
+	when "ル"; newname = "る/#{filename}";
+	when "レ"; newname = "れ/#{filename}";
+	when "ロ"; newname = "ろ/#{filename}";
+	when "ワ"; newname = "わ/#{filename}";
+	when "ヲ"; newname = "を/#{filename}";
+	when "ン"; newname = "ん/#{filename}";
+	end
+
+	newname
+end

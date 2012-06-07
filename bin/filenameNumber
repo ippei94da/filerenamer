@@ -1,0 +1,34 @@
+#! /usr/bin/ruby -w
+# coding: utf-8
+
+# 拡張子は保存
+# -i オプションで開始番号を指定
+# -p : preserve old name 元のファイル名を残す。foo.txt -> 001-foo.txt
+require "filerenamer/filerenamer.rb"
+require "filerenamer/filerenameroptionparser.rb"
+
+OPTIONS = {}
+op = FileRenamerOptionParser.new
+op.on("-i num", "--initial", "Indicate initial number."){ |val|
+	OPTIONS[:init] = val.to_i
+}
+op.on("-p", "--preserve", "Preserve old name."){
+	OPTIONS[:preserve] = true
+}
+op.parse!(ARGV)
+
+OPTIONS[:init] ||= 0
+
+fr = FileRenamer.new(op.options)
+fr.execute(ARGV) do |filename|
+	@counter ||= OPTIONS[:init]
+	if (OPTIONS[:preserve])
+		new_name = sprintf("%03d-%s", @counter, filename)
+	else 
+		extention = File.extname(filename)
+		new_name = sprintf("%03d%s", @counter, extention)
+	end
+	@counter += 1
+	new_name
+end
+
