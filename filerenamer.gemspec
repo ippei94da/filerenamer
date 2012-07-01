@@ -5,14 +5,14 @@
 
 Gem::Specification.new do |s|
   s.name = "filerenamer"
-  s.version = "0.0.0"
+  s.version = "0.0.1"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["ippei94da"]
-  s.date = "2012-06-07"
+  s.date = "2012-07-01"
   s.description = "This library provide common dealing to rename many files with safe method. Automatically mkdir if need and rmdir when empty."
   s.email = "ippei94da@gmail.com"
-  s.executables = ["classifyWith1stChar", "filenameNumber", "filenameRegulate", "renamer"]
+  s.executables = ["classify1stchar", "filenameNumber", "filenameRegulate", "renamer"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.rdoc"
@@ -24,7 +24,7 @@ Gem::Specification.new do |s|
     "README.rdoc",
     "Rakefile",
     "VERSION",
-    "bin/classifyWith1stChar",
+    "bin/classify1stchar",
     "bin/filenameNumber",
     "bin/filenameRegulate",
     "bin/renamer",
@@ -32,6 +32,7 @@ Gem::Specification.new do |s|
     "lib/filerenamer.rb",
     "lib/filerenamer/filerenamer.rb",
     "lib/filerenamer/filerenameroptionparser.rb",
+    "memo.txt",
     "test/filerenamer/a0.txt",
     "test/filerenamer/dummy.txt",
     "test/helper.rb",
