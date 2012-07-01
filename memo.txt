@@ -1,0 +1,5 @@
+0.0.1
+  renamer bin/classifyWith1stChar to classify1stchar
+  and add function of kanji kana inversion using kakasi.
+
+0.0.0 release
