@@ -10,10 +10,10 @@ require "filerenamer/filerenameroptionparser.rb"
 OPTIONS = {}
 op = FileRenamerOptionParser.new
 op.on("-i num", "--initial", "Indicate initial number."){ |val|
-	OPTIONS[:init] = val.to_i
+  OPTIONS[:init] = val.to_i
 }
 op.on("-p", "--preserve", "Preserve old name."){
-	OPTIONS[:preserve] = true
+  OPTIONS[:preserve] = true
 }
 op.parse!(ARGV)
 
@@ -21,14 +21,14 @@ OPTIONS[:init] ||= 0
 
 fr = FileRenamer.new(op.options)
 fr.execute(ARGV) do |filename|
-	@counter ||= OPTIONS[:init]
-	if (OPTIONS[:preserve])
-		new_name = sprintf("%03d-%s", @counter, filename)
-	else 
-		extention = File.extname(filename)
-		new_name = sprintf("%03d%s", @counter, extention)
-	end
-	@counter += 1
-	new_name
+  @counter ||= OPTIONS[:init]
+  if (OPTIONS[:preserve])
+    new_name = sprintf("%03d-%s", @counter, filename)
+  else 
+    extention = File.extname(filename)
+    new_name = sprintf("%03d%s", @counter, extention)
+  end
+  @counter += 1
+  new_name
 end
 
