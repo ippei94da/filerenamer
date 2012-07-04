@@ -1,39 +1,27 @@
 #! /usr/bin/env ruby
 # coding: utf-8
 
-require "optparse"
+# Rename a filename which replace a string between parentheses to just before extension.
+# Parentheses after a string which is not in parentheses leave. e.g.,
+#   ((ab)cd)(ef)gh(ij)kl(mn).txt -> gh(ij)kl(mn)((ab)cd)(ef).txt
+# Not check correspondence parentheses
+#   ((ab)cd)(ef)gh(ij)kl(mn.txt -> gh(ij)kl(mn((ab)cd)(ef).txt
 
-## option analysis
+require "filerenamer/filerenamer.rb"
+require "filerenamer/filerenameroptionparser.rb"
+
 OPTIONS = {}
-op = OptionParser.new
-op.on("-a"    , "--aho"    , "descriptionA"){    OPTIONS[:aho] = true}
-op.on("-b val", "--bak=val", "descriptionB"){|v| OPTIONS[:bak] = v}
+op = FileRenamerOptionParser.new
 op.parse!(ARGV)
 
+fr = FileRenamer.new(op.options)
+fr.execute(ARGV) do |filename|
 
 
-##! /usr/bin/ruby1.8 -w
-##! /usr/bin/ruby -Ke
-#
-#=begin
-#  file name の括弧で囲まれた部分を後ろにする。
-#  括弧に入ってない最初の部分まで処理したらそこで処理を止める。
-#  単純に正規表現をすると欲張りマッチで最初から最後までマッチしかねない。
-#  そのため括弧の対応を depth を見て処理する。
-#  すなわち ([ などの左括弧のたびに深さを 1 ずつ大きくし、
-#  )] などの右括弧のたびに深さを 1ずつ小さくする。
-#  プログラム開始時を depth = 0 とし、
-#  最初の文字が左括弧でなければそこで終了。
-#  左括弧ならば処理が進み、depth == 0 となる右括弧があればその時点で括弧内を
-#  拡張子直前に移す。
-#
-#  ファイル名の最後まで depth が 0 にならなかったならばエラーを吐いて何もしない。
-#  括弧種類の非対応はチェックしない。
-#=end
-#
-#require "FileRenamer/FileRenamer.rb"
-#$KCODE = "U"
-#
+  new_name
+end
+
+
 #def checkParen(char)
 #  case char
 #    when '('  then return 1
@@ -69,6 +57,14 @@ op.parse!(ARGV)
 #    else return 0
 #  end
 #end
+# 単純に正規表現をすると欲張りマッチで最初から最後までマッチしかねない。
+# そのため括弧の対応を depth を見て処理する。
+# すなわち ([ などの左括弧のたびに深さを 1 ずつ大きくし、
+# )] などの右括弧のたびに深さを 1ずつ小さくする。
+# プログラム開始時を depth = 0 とし、
+# 最初の文字が左括弧でなければそこで終了。
+# 左括弧ならば処理が進み、depth == 0 となる右括弧があればその時点で括弧内を
+# 拡張子直前に移す。
 #
 #require 'optparse'
 #ProgramConfig = Hash.new #オプション保存用のハッシュ
@@ -110,3 +106,5 @@ op.parse!(ARGV)
 #
 #end
 #
+
+テストに、()()().txt のように全て括弧でこうせいされているもの
