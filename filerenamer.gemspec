@@ -5,37 +5,42 @@
 
 Gem::Specification.new do |s|
   s.name = "filerenamer"
-  s.version = "0.0.1"
+  s.version = "0.0.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["ippei94da"]
-  s.date = "2012-07-01"
+  s.date = "2012-07-04"
   s.description = "This library provide common dealing to rename many files with safe method. Automatically mkdir if need and rmdir when empty."
   s.email = "ippei94da@gmail.com"
-  s.executables = ["classify1stchar", "filenameNumber", "filenameRegulate", "renamer"]
+  s.executables = ["classify1stchar", "rennum", "renpar", "renreg", "rensub"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.rdoc"
   ]
   s.files = [
     ".document",
+    "CHANGES",
     "Gemfile",
     "LICENSE.txt",
     "README.rdoc",
     "Rakefile",
     "VERSION",
     "bin/classify1stchar",
-    "bin/filenameNumber",
-    "bin/filenameRegulate",
-    "bin/renamer",
+    "bin/rennum",
+    "bin/renpar",
+    "bin/renreg",
+    "bin/rensub",
     "filerenamer.gemspec",
     "lib/filerenamer.rb",
     "lib/filerenamer/filerenamer.rb",
     "lib/filerenamer/filerenameroptionparser.rb",
-    "memo.txt",
     "test/filerenamer/a0.txt",
     "test/filerenamer/dummy.txt",
     "test/helper.rb",
+    "test/renpar/((ab)(cd(ef))gh(ij)kl(mn).txt",
+    "test/renpar/(ab)(cd(ef)))gh(ij)kl(mn).txt",
+    "test/renpar/(ab)(cd(ef))gh(ij)kl(mn).txt",
+    "test/renpar/(ab)(cd).txt",
     "test/test_filerenamer.rb",
     "test/test_filerenameroptionparser.rb"
   ]
@@ -53,14 +58,14 @@ Gem::Specification.new do |s|
       s.add_development_dependency(%q<bundler>, ["~> 1.1.4"])
       s.add_development_dependency(%q<jeweler>, ["~> 1.8.3"])
       s.add_development_dependency(%q<simplecov>, [">= 0"])
-      s.add_development_dependency(%q<builtinextension>, ["~> 0.0"])
+      s.add_development_dependency(%q<builtinextension>, ["~> 0.0.5"])
       s.add_development_dependency(%q<capture_stdout>, ["~> 0.0"])
     else
       s.add_dependency(%q<rdoc>, ["~> 3.12"])
       s.add_dependency(%q<bundler>, ["~> 1.1.4"])
       s.add_dependency(%q<jeweler>, ["~> 1.8.3"])
       s.add_dependency(%q<simplecov>, [">= 0"])
-      s.add_dependency(%q<builtinextension>, ["~> 0.0"])
+      s.add_dependency(%q<builtinextension>, ["~> 0.0.5"])
       s.add_dependency(%q<capture_stdout>, ["~> 0.0"])
     end
   else
@@ -68,7 +73,7 @@ Gem::Specification.new do |s|
     s.add_dependency(%q<bundler>, ["~> 1.1.4"])
     s.add_dependency(%q<jeweler>, ["~> 1.8.3"])
     s.add_dependency(%q<simplecov>, [">= 0"])
-    s.add_dependency(%q<builtinextension>, ["~> 0.0"])
+    s.add_dependency(%q<builtinextension>, ["~> 0.0.5"])
     s.add_dependency(%q<capture_stdout>, ["~> 0.0"])
   end
 end
