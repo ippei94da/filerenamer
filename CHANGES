@@ -1,8 +1,8 @@
 = filerenamer Changelog
 
-== Master (for 0.0.1)
+== Master (for 0.0.2)
 * Command name changes. rensub, rennum, etc.
-* Add bin/renpar
+* Add bin/renpar.
 
 == Version 0.0.1
 * bin/classifyWith1stChar to classify1stchar and add function of kanji kana inversion using kakasi.

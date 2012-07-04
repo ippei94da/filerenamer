@@ -7,6 +7,10 @@
 # Not check correspondence parentheses
 #   ((ab)cd)(ef)gh(ij)kl(mn.txt -> gh(ij)kl(mn((ab)cd)(ef).txt
 
+require "rubygems"
+gem "builtinextension"
+require "string_split_parens.rb"
+
 require "filerenamer/filerenamer.rb"
 require "filerenamer/filerenameroptionparser.rb"
 
@@ -16,9 +20,22 @@ op.parse!(ARGV)
 
 fr = FileRenamer.new(op.options)
 fr.execute(ARGV) do |filename|
+  extname  = File.extname( filename)
+  basename = File.basename(filename).sub(/#{extname}$/, "")
 
+  head = []
+  tail = []
+  tail_flag = true
+  basename.split_parens.each do |word|
+    tail_flag = false unless word[0].open_paren?
+    if tail_flag
+      tail << word
+    else
+      head << word
+    end
+  end
 
-  new_name
+  new_name = head.join + tail.join + extname
 end
 
 
@@ -106,5 +123,3 @@ end
 #
 #end
 #
-
-テストに、()()().txt のように全て括弧でこうせいされているもの
