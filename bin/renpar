@@ -1,0 +1,112 @@
+#! /usr/bin/env ruby
+# coding: utf-8
+
+require "optparse"
+
+## option analysis
+OPTIONS = {}
+op = OptionParser.new
+op.on("-a"    , "--aho"    , "descriptionA"){    OPTIONS[:aho] = true}
+op.on("-b val", "--bak=val", "descriptionB"){|v| OPTIONS[:bak] = v}
+op.parse!(ARGV)
+
+
+
+##! /usr/bin/ruby1.8 -w
+##! /usr/bin/ruby -Ke
+#
+#=begin
+#  file name の括弧で囲まれた部分を後ろにする。
+#  括弧に入ってない最初の部分まで処理したらそこで処理を止める。
+#  単純に正規表現をすると欲張りマッチで最初から最後までマッチしかねない。
+#  そのため括弧の対応を depth を見て処理する。
+#  すなわち ([ などの左括弧のたびに深さを 1 ずつ大きくし、
+#  )] などの右括弧のたびに深さを 1ずつ小さくする。
+#  プログラム開始時を depth = 0 とし、
+#  最初の文字が左括弧でなければそこで終了。
+#  左括弧ならば処理が進み、depth == 0 となる右括弧があればその時点で括弧内を
+#  拡張子直前に移す。
+#
+#  ファイル名の最後まで depth が 0 にならなかったならばエラーを吐いて何もしない。
+#  括弧種類の非対応はチェックしない。
+#=end
+#
+#require "FileRenamer/FileRenamer.rb"
+#$KCODE = "U"
+#
+#def checkParen(char)
+#  case char
+#    when '('  then return 1
+#    when '{'  then return 1
+#    when '['  then return 1
+#    when '<'  then return 1
+#    when '（' then return 1
+#    when '｛' then return 1
+#    #when '［' then return 1 #occur error?
+#    when '＜' then return 1
+#    when '〔' then return 1
+#    when '【' then return 1
+#    when '〈' then return 1
+#    when '《' then return 1
+#    #when '「' then return 1
+#    #when '『' then return 1
+#
+#    when ')'  then return -1
+#    when '}'  then return -1
+#    when ']'  then return -1
+#    when '>'  then return -1
+#    when '）' then return -1
+#    when '｝' then return -1
+#    #when '］' then return -1 #occur error?
+#    when '＞' then return -1
+#    when '〕' then return -1
+#    when '】' then return -1
+#    when '〉' then return -1
+#    when '》' then return -1
+#    #when '」' then return -1
+#    #when '』' then return -1
+#
+#    else return 0
+#  end
+#end
+#
+#require 'optparse'
+#ProgramConfig = Hash.new #オプション保存用のハッシュ
+#opt = OptionParser.new
+#opt.on('-e', '--execute', 'execute to rename') { |v| ProgramConfig[:e] = true }
+##opt.on('-c', '--copy',    'copy, not move')    { |v| ProgramConfig[:c] = true }
+#opt.parse!(ARGV)
+#
+#oldNames = ARGV
+#oldNames.each do |oldName|
+#  extName = File.extname(oldName)
+#  basenameAry = File.basename(oldName, extName).split(//)
+#    #String can hardly deal with multi byte char divide. Use array.
+#
+#  depth = 0
+#  i = 0
+#  tailStrAry = Array.new
+#  while(checkParen(basenameAry[0]) == 1) #continue while the strig starts with left paren
+#    headStrAry = Array.new
+#    begin
+#      char = basenameAry[0]
+#      depth += checkParen(char)
+#      headStrAry.push( char )
+#      basenameAry.shift
+#
+#      if ((basenameAry.size == 0) && (depth > 0 )) # error check.
+#        print "Parentheses mismatch. Rmaining depth: #{depth}\n"
+#        exit
+#      end
+#    end while (depth > 0)
+#    tailStrAry += headStrAry
+#
+#    #remove space characters at start.
+#    basenameAry = basenameAry.join.sub(/^\s*/, '').split(//)
+#  end
+#  newName = (basenameAry + tailStrAry).join + extName
+#
+#  FileRenamer.new(oldName, newName, ProgramConfig, Time.now ).checkAndGo
+#
+#end
+#
