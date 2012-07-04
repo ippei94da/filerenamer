@@ -18,10 +18,10 @@ old_str = /#{old_str}/ if OPTIONS[:regexp]
 
 fr = FileRenamer.new(op.options)
 fr.execute(files) do |filename|
-	if OPTIONS[:global]
-		new_name = filename.gsub(old_str, new_str)
-	else
-		new_name = filename.sub(old_str, new_str)
-	end
-	new_name
+  if OPTIONS[:global]
+    new_name = filename.gsub(old_str, new_str)
+  else
+    new_name = filename.sub(old_str, new_str)
+  end
+  new_name
 end
