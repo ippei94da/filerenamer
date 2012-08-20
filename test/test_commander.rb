@@ -4,22 +4,24 @@
 require 'helper'
 
 require "test/unit"
-require "filerenamer/filerenamer.rb"
+require "filerenamer/commander.rb"
 require "stringio"
 require "rubygems"
 gem "capture_stdout"
 require "capture_stdout"
 
-class FileRenamer
-  public :check_new_names
-  public :ask_yes?
-  public :run
-  public :make_new_names
-  public :paths
-  attr_reader :options
+module FileRenamer
+  class Commander
+    public :check_new_names
+    public :ask_yes?
+    public :run
+    public :make_new_names
+    public :paths
+    attr_reader :options
+  end
 end
 
-class TC_FileRenamer < Test::Unit::TestCase
+class TC_Commander < Test::Unit::TestCase
   EXIST_FILE = "test/filerenamer/dummy.txt"
 
   A_0 = "test/filerenamer/a0.txt"
@@ -27,10 +29,10 @@ class TC_FileRenamer < Test::Unit::TestCase
 
   def setup
     options = {}
-    @fr00 = FileRenamer.new(options)
+    @fr00 = FileRenamer::Commander.new(options, [])
 
     options = {:copy => true, :yes => true}
-    @fr01 = FileRenamer.new(options)
+    @fr01 = FileRenamer::Commander.new(options, [])
   end
 
   def test_initialize
@@ -39,24 +41,24 @@ class TC_FileRenamer < Test::Unit::TestCase
       :yes => true,
       :no => true,
     }
-    assert_raise(FileRenamerOptionError){ FileRenamer.new(options) }
+    assert_raise(FileRenamer::Commander::OptionError){ FileRenamer::Commander.new(options, []) }
 
     # ファイル操作モードがどれか1つのみ true なら OK。
     options = { :copy => true, }
-    assert_nothing_raised{ FileRenamer.new(options) }
+    assert_nothing_raised{ FileRenamer::Commander.new(options, []) }
 
     options = { :move => true, }
-    assert_nothing_raised{ FileRenamer.new(options) }
+    assert_nothing_raised{ FileRenamer::Commander.new(options, []) }
 
     options = { :hardlink => true, }
-    assert_nothing_raised{ FileRenamer.new(options) }
+    assert_nothing_raised{ FileRenamer::Commander.new(options, []) }
 
     options = { :symlink => true, }
-    assert_nothing_raised{ FileRenamer.new(options) }
+    assert_nothing_raised{ FileRenamer::Commander.new(options, []) }
 
     # ファイル操作モードが空でも OK で、その場合は :move が true として扱われる。
     options = { }
-    fr00 = FileRenamer.new(options)
+    fr00 = FileRenamer::Commander.new(options, [])
     assert_equal( {:move => true}, fr00.options )
 
     # ファイル操作モードで矛盾する2つ以上が true なら例外。
@@ -64,33 +66,33 @@ class TC_FileRenamer < Test::Unit::TestCase
       :move => true,
       :copy => true,
     }
-    assert_raise(FileRenamerOptionError){ FileRenamer.new(options) }
+    assert_raise(FileRenamer::Commander::OptionError){ FileRenamer::Commander.new(options, []) }
 
     options = {
       :move => true,
       :hardlink => true,
     }
-    assert_raise(FileRenamerOptionError){ FileRenamer.new(options) }
+    assert_raise(FileRenamer::Commander::OptionError){ FileRenamer::Commander.new(options, []) }
 
     options = {
       :move => true,
       :symlink => true,
     }
-    assert_raise(FileRenamerOptionError){ FileRenamer.new(options) }
+    assert_raise(FileRenamer::Commander::OptionError){ FileRenamer::Commander.new(options, []) }
 
     # :quiet が立てられれば、自動的に :yes も true になる。
     options = {:quiet => true}
-    fr00 = FileRenamer.new(options)
+    fr00 = FileRenamer::Commander.new(options, [])
     assert_equal( {:quiet => true, :yes => true, :move => true}, fr00.options )
 
     # :quiet が立てられれば、:yes が明示的に立っていても問題なし。
     options = {:quiet => true, :yes => true}
-    fr00 = FileRenamer.new(options)
+    fr00 = FileRenamer::Commander.new(options, [])
     assert_equal( {:quiet => true, :yes => true, :move => true}, fr00.options )
 
     # :quiet が立てられれば、:no が立っていれば例外。
     options = {:quiet => true, :no => true}
-    assert_raise(FileRenamerOptionError){ FileRenamer.new(options) }
+    assert_raise(FileRenamer::Commander::OptionError){ FileRenamer::Commander.new(options, []) }
   end
 
   def test_execute
@@ -99,8 +101,8 @@ class TC_FileRenamer < Test::Unit::TestCase
     FileUtils.rm(A_1) if FileTest.exist?(A_1)
     #
     options = {:copy => true, :yes => true}
-    fr01 = FileRenamer.new(options)
-    str = capture_stdout{fr01.execute([A_0]){ A_1 }}
+    fr01 = FileRenamer::Commander.new(options, [A_0])
+    str = capture_stdout{fr01.execute{ A_1 }}
     assert_equal(true, FileTest.exist?(A_0))
     assert_equal(true, FileTest.exist?(A_1))
     FileUtils.rm(A_1)
@@ -121,8 +123,8 @@ class TC_FileRenamer < Test::Unit::TestCase
     FileUtils.rm(A_1) if FileTest.exist?(A_1)
     #
     options = {:copy => true, :no => true}
-    fr01 = FileRenamer.new(options)
-    str = capture_stdout{ fr01.execute([A_0]){ A_1 }}
+    fr01 = FileRenamer::Commander.new(options, [A_0])
+    str = capture_stdout{ fr01.execute{ A_1 }}
     assert_equal(true , FileTest.exist?(A_0))
     assert_equal(false, FileTest.exist?(A_1))
     #
@@ -140,8 +142,8 @@ class TC_FileRenamer < Test::Unit::TestCase
     io = StringIO.new
     #
     options = {:copy => true, :quiet => true}
-    fr01 = FileRenamer.new(options)
-    str = capture_stdout{fr01.execute([A_0]){ A_1 }}
+    fr01 = FileRenamer::Commander.new(options, [A_0])
+    str = capture_stdout{fr01.execute{ A_1 }}
     assert_equal(true, FileTest.exist?(A_0))
     assert_equal(true, FileTest.exist?(A_1))
     FileUtils.rm(A_1)
@@ -156,8 +158,8 @@ class TC_FileRenamer < Test::Unit::TestCase
     output = StringIO.new
     #
     options = {:copy => true}
-    fr01 = FileRenamer.new(options)
-    str = capture_stdout{fr01.execute([A_0]){ A_1 }}
+    fr01 = FileRenamer::Commander.new(options, [A_0])
+    str = capture_stdout{fr01.execute{ A_1 }}
     assert_equal(true, FileTest.exist?(A_0))
     assert_equal(true, FileTest.exist?(A_1))
     FileUtils.rm(A_1)
@@ -184,8 +186,8 @@ class TC_FileRenamer < Test::Unit::TestCase
     output = StringIO.new
     #
     options = {:copy => true}
-    fr01 = FileRenamer.new(options)
-    str = capture_stdout{fr01.execute([A_1]){ A_0 }}
+    fr01 = FileRenamer::Commander.new(options, [A_1])
+    str = capture_stdout{fr01.execute{ A_0 }}
     assert_equal(true , FileTest.exist?(A_0))
     assert_equal(false, FileTest.exist?(A_1))
     #
@@ -207,7 +209,7 @@ class TC_FileRenamer < Test::Unit::TestCase
     #FileUtils.rm(A_1) if FileTest.exist?(A_1)
     ##
     #options = {:copy => true, :no => true}
-    #fr01 = FileRenamer.new(options)
+    #fr01 = FileRenamer::Commander.new(options)
     #str = capture_stdout{ fr01.execute([]){|name| name + ".00"}}
     ##
     #correct = 
@@ -225,12 +227,15 @@ class TC_FileRenamer < Test::Unit::TestCase
   end
 
   def test_make_new_names
+    options = {}
+    #pp [A_0, A_1]; exit
+    fr00 = FileRenamer::Commander.new(options, [A_0, A_1])
     assert_equal(
       {
         A_0 => A_0 + "00",
         A_1 => A_1 + "00",
       },
-      @fr00.make_new_names([A_0, A_1]){ |old|
+      fr00.make_new_names{ |old|
         old.sub(/$/, "00")
       }
     )
@@ -312,47 +317,6 @@ class TC_FileRenamer < Test::Unit::TestCase
   end
 
   def test_run
-#		# ディレクトリ管理不要の場合
-#		FileUtils.rm(A_1) if FileTest.exist?(A_1)
-#		#
-#		@fr01.run(A_0, A_1)
-#		io = capture_stdout{ @fr01.run(A_0, A_1) }
-#		io.rewind
-#		assert_equal(["  cp -r #{A_0} #{A_1}\n"], io.readlines)
-#		#
-#		assert_equal(true, FileTest.exist?(A_0))
-#		assert_equal(true, FileTest.exist?(A_1))
-#		#
-#		# あとかたづけ
-#		FileUtils.rm(A_1)
-#
-#		# ディレクトリ生成が必要な場合
-#		FileUtils.rm("tmp/#{A_1}") if FileTest.exist?("tmp/#{A_1}")
-#		FileUtils.rmdir("tmp/test/FileRenamer") if FileTest.exist?("tmp/test/FileRenamer")
-#		FileUtils.rmdir("tmp/test") if FileTest.exist?("tmp/test")
-#		FileUtils.rmdir("tmp") if FileTest.exist?("tmp")
-#		#
-#		io = capture_stdout{ @fr01.run(A_0, "tmp/"+A_1) }
-#		io.rewind
-#		t = io.readlines
-#		assert_equal("  make directory: tmp\n", t[0])
-#		assert_equal("  make directory: tmp/test\n", t[1])
-#		assert_equal("  make directory: tmp/test/FileRenamer\n", t[2])
-#		assert_equal("  cp -r #{A_0} tmp/#{A_1}\n", t[3])
-#		assert_equal(4, t.size)
-#		#
-#		assert_equal(true, FileTest.exist?(A_0))
-#		assert_equal(true, FileTest.exist?("tmp/#{A_1}"))
-#		assert_equal(true, FileTest.exist?("tmp/test/FileRenamer"))
-#		assert_equal(true, FileTest.exist?("tmp/test"            ))
-#		assert_equal(true, FileTest.exist?("tmp"                 ))
-#		#
-#		# あとかたづけ
-#		FileUtils.rm("tmp/#{A_1}")
-#		FileUtils.rmdir("tmp/test/FileRenamer")
-#		FileUtils.rmdir("tmp/test"            )
-#		FileUtils.rmdir("tmp"                 )
-
     # ディレクトリ消去が必要な場合
     FileUtils.rm("tmp1/dir/a1.txt") if FileTest.exist?("tmp1/dir/a1.txt")
     FileUtils.rm("tmp2/dir/a1.txt") if FileTest.exist?("tmp2/dir/a1.txt")

@@ -1,0 +1,48 @@
+#! /usr/bin/ruby -w
+# coding: utf-8
+
+# Pad 0 onto the first numeric character series in filenames to become the same length.
+
+require "pp"
+require "filerenamer/commander.rb"
+require "filerenamer/optionparser.rb"
+
+PATTERN = /^(\D*)(\d+)(.*)$/
+
+class String
+  def num_length
+    self =~ PATTERN
+    $2.length
+  end
+end
+
+
+OPTIONS = {}
+op = FileRenamer::OptionParser.new
+op.parse!(ARGV)
+
+#pp length
+#exit
+
+fr = FileRenamer::Commander.new(op.options, ARGV)
+
+length ||= fr.files.max_by { |str| str.num_length }.num_length
+#pp length
+
+fr.execute do |filename|
+  filename =~ PATTERN
+  head = $1
+  body = $2.to_i
+  tail = $3
+
+  #pp head
+  #pp body
+  #pp tail
+  #pp length
+  #puts
+
+  new_name = head + sprintf("%0#{length}d", body) + tail
+  new_name
+end
+
+

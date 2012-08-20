@@ -1,16 +1,18 @@
 #! /usr/bin/env ruby
 # coding: utf-8
 
-require "filerenamer/filerenamer.rb"
-require "filerenamer/filerenameroptionparser.rb"
+#gem "filerenamer"
+require "filerenamer.rb"
+#require "filerenamer/commander.rb"
+#require "filerenamer/optionparser.rb"
 
 OPTIONS = {}
-op = FileRenamerOptionParser.new
+op = FileRenamer::OptionParser.new
 op.parse!(ARGV)
-files = ARGV
+#files = ARGV
 
-fr = FileRenamer.new(op.options)
-fr.execute(files) do |filename|
+fr = FileRenamer::Commander.new(op.options, ARGV)
+fr.execute do |filename|
   next if filename.size == 1
 
   yomi = `echo #{filename} | nkf -e | kakasi -JH | nkf -w`

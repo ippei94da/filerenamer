@@ -1,23 +1,22 @@
 #! /usr/bin/env ruby
 # coding: utf-8
 
-require "filerenamer/filerenamer.rb"
-require "filerenamer/filerenameroptionparser.rb"
+require "filerenamer/commander.rb"
+require "filerenamer/optionparser.rb"
 
 OPTIONS = {}
-op = FileRenamerOptionParser.new
+op = FileRenamer::OptionParser.new
 op.on("-g", "--global", "Global substitution."){ OPTIONS[:global] = true }
 op.on("-r", "--reg-exp", "Regular expression."){ OPTIONS[:regexp] = true }
 op.parse!(ARGV)
 
 old_str = ARGV.shift
 new_str = ARGV.shift
-files = ARGV
 
 old_str = /#{old_str}/ if OPTIONS[:regexp]
 
-fr = FileRenamer.new(op.options)
-fr.execute(files) do |filename|
+fr = FileRenamer::Commander.new(op.options, ARGV)
+fr.execute do |filename|
   if OPTIONS[:global]
     new_name = filename.gsub(old_str, new_str)
   else

@@ -1,14 +1,14 @@
 #! /usr/bin/env ruby
 # coding: utf-8
 
-require "filerenamer/filerenamer.rb"
-require "filerenamer/filerenameroptionparser.rb"
+require "filerenamer/commander.rb"
+require "filerenamer/optionparser.rb"
 
-op = FileRenamerOptionParser.new
+op = FileRenamer::OptionParser.new
 op.parse!(ARGV)
 
-fr = FileRenamer.new(op.options)
-fr.execute(ARGV) do |filename|
+fr = FileRenamer::Commander.new(op.options, ARGV)
+fr.execute do |filename|
   new_name = filename.dup
   new_name.gsub!('ａ','a'); new_name.gsub!('ｂ','b'); new_name.gsub!('ｃ','c');
   new_name.gsub!('ｄ','d'); new_name.gsub!('ｅ','e'); new_name.gsub!('ｆ','f');
