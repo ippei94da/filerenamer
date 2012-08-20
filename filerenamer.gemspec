@@ -5,14 +5,14 @@
 
 Gem::Specification.new do |s|
   s.name = "filerenamer"
-  s.version = "0.0.2"
+  s.version = "0.0.3"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["ippei94da"]
   s.date = "2012-08-20"
   s.description = "This library provide common dealing to rename many files with safe method. Automatically mkdir if need and rmdir when empty."
   s.email = "ippei94da@gmail.com"
-  s.executables = ["classify1stchar", "rennum", "renpar", "renreg", "rensub"]
+  s.executables = ["classify1stchar", "rennum", "renpad", "renpar", "renreg", "rensub"]
   s.extra_rdoc_files = [
     "LICENSE.txt",
     "README.rdoc"
@@ -27,22 +27,49 @@ Gem::Specification.new do |s|
     "VERSION",
     "bin/classify1stchar",
     "bin/rennum",
+    "bin/renpad",
     "bin/renpar",
     "bin/renreg",
     "bin/rensub",
     "filerenamer.gemspec",
     "lib/filerenamer.rb",
-    "lib/filerenamer/filerenamer.rb",
-    "lib/filerenamer/filerenameroptionparser.rb",
+    "lib/filerenamer/commander.rb",
+    "lib/filerenamer/optionparser.rb",
+    "test/classify1stchar/123",
+    "test/classify1stchar/abc",
+    "test/classify1stchar/def",
     "test/filerenamer/a0.txt",
     "test/filerenamer/dummy.txt",
     "test/helper.rb",
+    "test/rennum/a",
+    "test/rennum/b",
+    "test/rennum/c",
+    "test/rennum/d",
+    "test/renpad/1",
+    "test/renpad/10",
+    "test/renpad/100",
+    "test/renpad/100b",
+    "test/renpad/10b",
+    "test/renpad/1b",
+    "test/renpad/a1",
+    "test/renpad/a10",
+    "test/renpad/a100",
+    "test/renpad/a100b",
+    "test/renpad/a10b",
+    "test/renpad/a1b",
     "test/renpar/((ab)(cd(ef))gh(ij)kl(mn).txt",
     "test/renpar/(ab)(cd(ef)))gh(ij)kl(mn).txt",
     "test/renpar/(ab)(cd(ef))gh(ij)kl(mn).txt",
     "test/renpar/(ab)(cd).txt",
-    "test/test_filerenamer.rb",
-    "test/test_filerenameroptionparser.rb"
+    "test/renreg/a(b)",
+    "test/renreg/１",
+    "test/renreg/ａ",
+    "test/rensub/a0",
+    "test/rensub/a1",
+    "test/rensub/b0",
+    "test/rensub/b1",
+    "test/test_commander.rb",
+    "test/test_optionparser.rb"
   ]
   s.homepage = "http://github.com/ippei94da/filerenamer"
   s.licenses = ["MIT"]
