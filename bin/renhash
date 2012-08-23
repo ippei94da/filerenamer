@@ -1,0 +1,18 @@
+#! /usr/bin/env ruby
+# coding: utf-8
+
+require "pp"
+require "filerenamer/commander.rb"
+require "filerenamer/optionparser.rb"
+
+HASH_COMMAND = "sha256sum"
+op = FileRenamer::OptionParser.new
+op.parse!(ARGV)
+
+fr = FileRenamer::Commander.new(op.options, ARGV)
+fr.execute do |filename|
+  extname = File.extname filename
+  basename = `#{HASH_COMMAND} #{filename}`.sub(/ *#{filename}$/, '').chomp
+  newname = basename + extname
+  newname
+end
