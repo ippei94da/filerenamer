@@ -1,19 +1,20 @@
 = filerenamer Changelog
 
 == Master (for 0.0.4)
+* Add renhash
 
 == Version 0.0.3
 * Restruct class and module name
-* Add bin/renpad.
+* Add bin/renpad
 
 == Version 0.0.2
-* Command name changes. rensub, rennum, etc.
-* Add bin/renpar.
+* Command name changes; rensub, rennum, etc
+* Add bin/renpar
 
 == Version 0.0.1
-* bin/classifyWith1stChar to classify1stchar and add function of kanji kana inversion using kakasi.
+* bin/classifyWith1stChar to classify1stchar and add function of kanji kana inversion using kakasi
 
 == Version 0.0.0
 
-* Initial release.
+* Initial release
 
