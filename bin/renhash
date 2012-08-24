@@ -4,8 +4,9 @@
 require "pp"
 gem "builtinextension"
 require "string_escape_zsh.rb"
-require "filerenamer/commander.rb"
-require "filerenamer/optionparser.rb"
+require "filerenamer.rb"
+#require "filerenamer/commander.rb"
+#require "filerenamer/optionparser.rb"
 
 HASH_COMMAND = "sha256sum"
 op = FileRenamer::OptionParser.new

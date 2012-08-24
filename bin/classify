@@ -1,21 +1,22 @@
 #! /usr/bin/env ruby
 # coding: utf-8
 
-#gem "filerenamer"
+gem "builtinextension"
+require "string_escape_zsh.rb"
 require "filerenamer.rb"
-#require "filerenamer/commander.rb"
-#require "filerenamer/optionparser.rb"
 
 OPTIONS = {}
 op = FileRenamer::OptionParser.new
+op.on("-j"       , "--japanese-yomi", "Use Japanese yomi. (Need kakasi)"){    OPTIONS[:japanese] = true}
+op.on("-l number", "--length=number", "Indicate length of initial characters."){|v| OPTIONS[:length] = v}
+#replace character
 op.parse!(ARGV)
-#files = ARGV
 
 fr = FileRenamer::Commander.new(op.options, ARGV)
 fr.execute do |filename|
   next if filename.size == 1
 
-  yomi = `echo #{filename} | nkf -e | kakasi -JH | nkf -w`
+  yomi = `echo #{filename.escape_zsh} | nkf -e | kakasi -JH | nkf -w`
 
   char = yomi[0]
   case char

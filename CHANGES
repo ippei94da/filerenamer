@@ -2,6 +2,10 @@
 
 == Master (for 0.0.4)
 * Add renhash
+* Rename bin/classify1stchar to bin/classify
+* Add function to bin/classify1stchar
+  * Japanese-yomi is indicated to be option.
+  * length of initial characters
 
 == Version 0.0.3
 * Restruct class and module name
