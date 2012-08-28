@@ -1,6 +1,7 @@
 = filerenamer Changelog
 
 == Master (for 0.0.5)
+* Bugfix bin/classify
 
 == Version 0.0.4
 * Add renhash

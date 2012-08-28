@@ -74,7 +74,7 @@ require "filerenamer.rb"
 OPTIONS = {}
 op = FileRenamer::OptionParser.new
 op.on("-k"       , "--kakasi", "Japanese yomi dirname. (Using kakasi)"){    OPTIONS[:kakasi] = true}
-op.on("-l number", "--length=number", "Indicate length of initial characters. Default number = 1."){|v| OPTIONS[:length] = v}
+op.on("-l number", "--length=number", "Indicate length of initial characters. Default number = 1."){|v| OPTIONS[:length] = v.to_i}
 op.on("-s", "--shorten", "Shorten filename, duplicated part with the dirname."){ OPTIONS[:shorten] = true}
 op.parse!(ARGV)
 
@@ -86,7 +86,7 @@ end
 
 fr = FileRenamer::Commander.new(op.options, ARGV)
 fr.execute do |filename|
-  next if filename.size == 1
+  next if filename.size <= OPTIONS[:length]
 
   if OPTIONS[:kakasi]
     dirname = `echo #{filename.escape_zsh} | nkf -e | kakasi -JH | nkf -w`
