@@ -1,131 +1,103 @@
 #! /usr/bin/env ruby
 # coding: utf-8
 
+# OPTIONS
+#
+# -s, -k, -l=2
+# x  x  x  : 月火水 -> 月/月火水
+# o  x  x  : 月火水 -> 月/火水
+# x  o  x  : 月火水 -> け/月火水
+# o  o  x  : 月火水 -> 実行不可
+# x  x  o  : 月火水 -> 月火/月火水
+# o  x  o  : 月火水 -> 月火/水
+# x  o  o  : 月火水 -> げつ/月火水
+# o  o  o  : 月火水 -> 実行不可
+
+# Now discussing whether SEION function is need or not.
+#SEION = {
+#  #### ひらがな
+#  # 清音
+#  "あ"=>"あ", "い"=>"い", "う"=>"う", "え"=>"え", "お"=>"お",
+#  "か"=>"か", "き"=>"き", "く"=>"く", "け"=>"け", "こ"=>"こ",
+#  "さ"=>"さ", "し"=>"し", "す"=>"す", "せ"=>"せ", "そ"=>"そ",
+#  "た"=>"た", "ち"=>"ち", "つ"=>"つ", "て"=>"て", "と"=>"と",
+#  "な"=>"な", "に"=>"に", "ぬ"=>"ぬ", "ね"=>"ね", "の"=>"の",
+#  "は"=>"は", "ひ"=>"ひ", "ふ"=>"ふ", "へ"=>"へ", "ほ"=>"ほ",
+#  "ま"=>"ま", "み"=>"み", "む"=>"む", "め"=>"め", "も"=>"も",
+#  "や"=>"や", "ゆ"=>"ゆ", "よ"=>"よ",
+#  "ら"=>"ら", "り"=>"り", "る"=>"る", "れ"=>"れ", "ろ"=>"ろ",
+#  "わ"=>"わ", "ゐ"=>"ゐ", "ゑ"=>"ゑ", "を"=>"を", "ん"=>"ん",
+#  # 濁音・半濁音
+#  "が"=>"か", "ぎ"=>"き", "ぐ"=>"く", "げ"=>"け", "ご"=>"こ",
+#  "ざ"=>"さ", "じ"=>"し", "ず"=>"す", "ぜ"=>"せ", "ぞ"=>"そ",
+#  "だ"=>"た", "ぢ"=>"ち", "づ"=>"つ", "で"=>"て", "ど"=>"と",
+#  "ば"=>"は", "び"=>"ひ", "ぶ"=>"ふ", "べ"=>"へ", "ぼ"=>"ほ",
+#  "ぱ"=>"は", "ぴ"=>"ひ", "ぷ"=>"ふ", "ぺ"=>"へ", "ぽ"=>"ほ",
+#  # 小字
+#  "ぁ"=>"あ", "ぃ"=>"い", "ぅ"=>"う", "ぇ"=>"え", "ぉ"=>"お",
+#  "っ"=>"つ",
+#  "ゃ"=>"や", "ゅ"=>"ゆ", "ょ"=>"よ",
+#  "ゎ"=>"わ",
+#
+#  #### カタカナ
+#  # 清音
+#  "ア"=>"あ", "イ"=>"い", "ウ"=>"う", "エ"=>"え", "オ"=>"お",
+#  "カ"=>"か", "キ"=>"き", "ク"=>"く", "ケ"=>"け", "コ"=>"こ",
+#  "サ"=>"さ", "シ"=>"し", "ス"=>"す", "セ"=>"せ", "ソ"=>"そ",
+#  "タ"=>"た", "チ"=>"ち", "ツ"=>"つ", "テ"=>"て", "ト"=>"と",
+#  "ナ"=>"な", "ニ"=>"に", "ヌ"=>"ぬ", "ネ"=>"ね", "ノ"=>"の",
+#  "ハ"=>"は", "ヒ"=>"ひ", "フ"=>"ふ", "ヘ"=>"へ", "ホ"=>"ほ",
+#  "マ"=>"ま", "ミ"=>"み", "ム"=>"む", "メ"=>"め", "モ"=>"も",
+#  "ヤ"=>"や", "ユ"=>"ゆ", "ヨ"=>"よ",
+#  "ラ"=>"ら", "リ"=>"り", "ル"=>"る", "レ"=>"れ", "ロ"=>"ろ",
+#  "ワ"=>"わ", "ヰ"=>"ゐ", "ヱ"=>"ゑ", "ヲ"=>"を", "ン"=>"ん",
+#  # 濁音・半濁音
+#  "ガ"=>"か", "ギ"=>"き", "グ"=>"く", "ゲ"=>"け", "ゴ"=>"こ",
+#  "ザ"=>"さ", "ジ"=>"し", "ズ"=>"す", "ゼ"=>"せ", "ゾ"=>"そ",
+#  "ダ"=>"た", "ヂ"=>"ち", "ヅ"=>"つ", "デ"=>"て", "ド"=>"と",
+#  "バ"=>"は", "ビ"=>"ひ", "ブ"=>"ふ", "ベ"=>"へ", "ボ"=>"ほ",
+#  "パ"=>"は", "ピ"=>"ひ", "プ"=>"ふ", "ペ"=>"へ", "ポ"=>"ほ",
+#  "ヴ"=>"う",
+#  # 小字
+#  "ァ"=>"あ", "ィ"=>"い", "ゥ"=>"う", "ェ"=>"え", "ォ"=>"お",
+#  "ッ"=>"つ",
+#  "ャ"=>"や", "ュ"=>"ゆ", "ョ"=>"よ",
+#  "ヮ"=>"わ",
+#  # 記号
+#  #"ヵ"=>"か", "ヶ"=>"け",
+#}
+
 gem "builtinextension"
 require "string_escape_zsh.rb"
 require "filerenamer.rb"
 
 OPTIONS = {}
 op = FileRenamer::OptionParser.new
-op.on("-j"       , "--japanese-yomi", "Use Japanese yomi. (Need kakasi)"){    OPTIONS[:japanese] = true}
-op.on("-l number", "--length=number", "Indicate length of initial characters."){|v| OPTIONS[:length] = v}
-#replace character
+op.on("-k"       , "--kakasi", "Japanese yomi dirname. (Using kakasi)"){    OPTIONS[:kakasi] = true}
+op.on("-l number", "--length=number", "Indicate length of initial characters. Default number = 1."){|v| OPTIONS[:length] = v}
+op.on("-s", "--shorten", "Shorten filename, duplicated part with the dirname."){ OPTIONS[:shorten] = true}
 op.parse!(ARGV)
+
+OPTIONS[:length] ||= 1
+if OPTIONS[:shorten] && OPTIONS[:kakasi]
+  puts "Options -s and -k cannot be used at the same time."
+  exit
+end
 
 fr = FileRenamer::Commander.new(op.options, ARGV)
 fr.execute do |filename|
   next if filename.size == 1
 
-  yomi = `echo #{filename.escape_zsh} | nkf -e | kakasi -JH | nkf -w`
+  if OPTIONS[:kakasi]
+    dirname = `echo #{filename.escape_zsh} | nkf -e | kakasi -JH | nkf -w`
+  else
+    dirname = filename
+  end
+  dirname = dirname[0..(OPTIONS[:length]-1)]
 
-  char = yomi[0]
-  case char
-  when /[a-z0-9]/
-    newname = "#{char}/#{filename}"
-  when /[A-Z]/
-    newname = "#{char.downcase}/#{filename}"
-  when "が"; newname = "か/#{filename}";
-  when "ぎ"; newname = "き/#{filename}";
-  when "ぐ"; newname = "く/#{filename}";
-  when "げ"; newname = "け/#{filename}";
-  when "ご"; newname = "こ/#{filename}";
-  when "ざ"; newname = "さ/#{filename}";
-  when "じ"; newname = "し/#{filename}";
-  when "ず"; newname = "す/#{filename}";
-  when "ぜ"; newname = "せ/#{filename}";
-  when "ぞ"; newname = "そ/#{filename}";
-  when "だ"; newname = "た/#{filename}";
-  when "ぢ"; newname = "ち/#{filename}";
-  when "づ"; newname = "つ/#{filename}";
-  when "で"; newname = "て/#{filename}";
-  when "ど"; newname = "と/#{filename}";
-  when "ば"; newname = "は/#{filename}";
-  when "び"; newname = "ひ/#{filename}";
-  when "ぶ"; newname = "ふ/#{filename}";
-  when "べ"; newname = "へ/#{filename}";
-  when "ぼ"; newname = "ほ/#{filename}";
-  when "ぱ"; newname = "は/#{filename}";
-  when "ぴ"; newname = "ひ/#{filename}";
-  when "ぷ"; newname = "ふ/#{filename}";
-  when "ぺ"; newname = "へ/#{filename}";
-  when "ぽ"; newname = "ほ/#{filename}";
-  when /[あ-ん]/
-    newname = "#{char}/#{filename}"
-
-  when "ガ"; newname = "か/#{filename}";
-  when "ギ"; newname = "き/#{filename}";
-  when "グ"; newname = "く/#{filename}";
-  when "ゲ"; newname = "け/#{filename}";
-  when "ゴ"; newname = "こ/#{filename}";
-  when "ザ"; newname = "さ/#{filename}";
-  when "ジ"; newname = "し/#{filename}";
-  when "ズ"; newname = "す/#{filename}";
-  when "ゼ"; newname = "せ/#{filename}";
-  when "ゾ"; newname = "そ/#{filename}";
-  when "ダ"; newname = "た/#{filename}";
-  when "ヂ"; newname = "ち/#{filename}";
-  when "ヅ"; newname = "つ/#{filename}";
-  when "デ"; newname = "て/#{filename}";
-  when "ド"; newname = "と/#{filename}";
-  when "バ"; newname = "は/#{filename}";
-  when "ビ"; newname = "ひ/#{filename}";
-  when "ブ"; newname = "ふ/#{filename}";
-  when "ベ"; newname = "へ/#{filename}";
-  when "ボ"; newname = "ほ/#{filename}";
-  when "パ"; newname = "は/#{filename}";
-  when "ピ"; newname = "ひ/#{filename}";
-  when "プ"; newname = "ふ/#{filename}";
-  when "ペ"; newname = "へ/#{filename}";
-  when "ポ"; newname = "ほ/#{filename}";
-  when "ヴ"; newname = "う/#{filename}";
-
-  when "ア"; newname = "あ/#{filename}";
-  when "イ"; newname = "い/#{filename}";
-  when "ウ"; newname = "う/#{filename}";
-  when "エ"; newname = "え/#{filename}";
-  when "オ"; newname = "お/#{filename}";
-  when "カ"; newname = "か/#{filename}";
-  when "キ"; newname = "き/#{filename}";
-  when "ク"; newname = "く/#{filename}";
-  when "ケ"; newname = "け/#{filename}";
-  when "コ"; newname = "こ/#{filename}";
-  when "サ"; newname = "さ/#{filename}";
-  when "シ"; newname = "し/#{filename}";
-  when "ス"; newname = "す/#{filename}";
-  when "セ"; newname = "せ/#{filename}";
-  when "ソ"; newname = "そ/#{filename}";
-  when "タ"; newname = "た/#{filename}";
-  when "チ"; newname = "ち/#{filename}";
-  when "ツ"; newname = "つ/#{filename}";
-  when "テ"; newname = "て/#{filename}";
-  when "ト"; newname = "と/#{filename}";
-  when "ナ"; newname = "な/#{filename}";
-  when "ニ"; newname = "に/#{filename}";
-  when "ヌ"; newname = "ぬ/#{filename}";
-  when "ネ"; newname = "ね/#{filename}";
-  when "ノ"; newname = "の/#{filename}";
-  when "ハ"; newname = "は/#{filename}";
-  when "ヒ"; newname = "ひ/#{filename}";
-  when "フ"; newname = "ふ/#{filename}";
-  when "ヘ"; newname = "へ/#{filename}";
-  when "ホ"; newname = "ほ/#{filename}";
-  when "マ"; newname = "ま/#{filename}";
-  when "ミ"; newname = "み/#{filename}";
-  when "ム"; newname = "む/#{filename}";
-  when "メ"; newname = "め/#{filename}";
-  when "モ"; newname = "も/#{filename}";
-  when "ヤ"; newname = "や/#{filename}";
-  when "ユ"; newname = "ゆ/#{filename}";
-  when "ヨ"; newname = "よ/#{filename}";
-  when "ラ"; newname = "ら/#{filename}";
-  when "リ"; newname = "り/#{filename}";
-  when "ル"; newname = "る/#{filename}";
-  when "レ"; newname = "れ/#{filename}";
-  when "ロ"; newname = "ろ/#{filename}";
-  when "ワ"; newname = "わ/#{filename}";
-  when "ヲ"; newname = "を/#{filename}";
-  when "ン"; newname = "ん/#{filename}";
+  if OPTIONS[:shorten]
+    filename = filename[OPTIONS[:length]..(-1)]
   end
 
-  newname
+  dirname + "/" + filename
 end
