@@ -1,7 +1,10 @@
 = filerenamer Changelog
 
-== Master (for 0.0.5)
+== Master (for 0.0.6)
+
+== Version 0.0.5
 * Bugfix bin/classify
+* Add bin/rentime
 
 == Version 0.0.4
 * Add renhash
