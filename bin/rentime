@@ -1,0 +1,20 @@
+#! /usr/bin/env ruby
+# coding: utf-8
+
+require "pp"
+#gem "builtinextension"
+#require "string_escape_zsh.rb"
+require "filerenamer.rb"
+
+op = FileRenamer::OptionParser.new
+op.parse!(ARGV)
+
+fr = FileRenamer::Commander.new(op.options, ARGV)
+fr.execute do |filename|
+  extname = File.extname filename
+  dirname = File.dirname filename
+  date = File.mtime(filename)
+
+  newname = dirname + date.strftime("/%Y%m%d-%H%M%S") + extname
+  newname
+end
