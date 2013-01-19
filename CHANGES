@@ -1,6 +1,7 @@
 = filerenamer Changelog
 
 == Master (for 0.0.6)
+* Add --unite option to bin/classify, which unite t and T into T.
 
 == Version 0.0.5
 * Bugfix bin/classify
