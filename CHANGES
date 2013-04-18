@@ -1,6 +1,8 @@
 = filerenamer Changelog
 
-== Master (for 0.0.6)
+== Master (for 0.0.7)
+
+== Version 0.0.6 [2013-04-18] released
 * Add --unite option to bin/classify, which unite t and T into T.
 * Adjust to builtinextension-0.1.0.
 
