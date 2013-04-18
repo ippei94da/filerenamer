@@ -3,7 +3,7 @@
 
 require "pp"
 gem "builtinextension"
-require "string_escape_zsh.rb"
+require "string/escapezsh.rb"
 require "filerenamer.rb"
 #require "filerenamer/commander.rb"
 #require "filerenamer/optionparser.rb"

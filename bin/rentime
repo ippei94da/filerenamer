@@ -2,8 +2,6 @@
 # coding: utf-8
 
 require "pp"
-#gem "builtinextension"
-#require "string_escape_zsh.rb"
 require "filerenamer.rb"
 
 op = FileRenamer::OptionParser.new

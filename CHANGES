@@ -2,6 +2,7 @@
 
 == Master (for 0.0.6)
 * Add --unite option to bin/classify, which unite t and T into T.
+* Adjust to builtinextension-0.1.0.
 
 == Version 0.0.5
 * Bugfix bin/classify

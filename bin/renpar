@@ -9,7 +9,7 @@
 
 require "rubygems"
 gem "builtinextension"
-require "string_split_parens.rb"
+require "string/splitparens.rb"
 
 require "filerenamer/commander.rb"
 require "filerenamer/optionparser.rb"

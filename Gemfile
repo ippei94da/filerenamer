@@ -7,10 +7,10 @@ source "http://rubygems.org"
 # Include everything needed to run rake, tests, features, etc.
 group :development do
   gem "rdoc", "~> 3.12"
-  gem "bundler", "~> 1.2.2"
+  gem "bundler", "~> 1.3.5"
   gem "jeweler", "~> 1.8.3"
   gem "simplecov", ">= 0"
-  gem "builtinextension", "~> 0.0.5"
+  gem "builtinextension", "~> 0.1.0"
   gem "capture_stdout", "~> 0.0"
-  gem "psych", ">= 0"
+  #gem "psych", ">= 0"
 end

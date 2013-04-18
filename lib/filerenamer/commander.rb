@@ -3,8 +3,8 @@
 
 require "rubygems"
 gem "builtinextension"
-require "string_escape_zsh.rb"
-require "string_width.rb"
+require "string/escapezsh.rb"
+require "string/width.rb"
 
 require "fileutils"
 require "optparse"
