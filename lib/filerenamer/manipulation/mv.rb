@@ -4,7 +4,8 @@
 # Abstract class for file manipulation.
 #
 #
-class FileRenamer::Manipulation
+class FileRenamer::Manipulation::Mv
+  TODO
   
   class NotImplementedError < Exception; end
   class ArgumentError < Exception; end

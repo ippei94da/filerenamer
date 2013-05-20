@@ -9,6 +9,5 @@ class TC_Manipulation < Test::Unit::TestCase
   #def setup
   #  @m00 = FileRenamer::Manipulation.new
   #end
-
 end
 
