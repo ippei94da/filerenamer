@@ -28,7 +28,8 @@ class FileRenamer::Manipulation::Mv
     raise NotImplementedError
   end
 
-  def execute(flag_show = true)
+  #if io is set, to_s 
+  def execute(io)
     puts to_s
     raise NotImplementedError
   end
