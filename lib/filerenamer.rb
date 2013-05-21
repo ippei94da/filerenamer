@@ -10,5 +10,6 @@ require "filerenamer/manipulation/lns.rb"
 require "filerenamer/manipulationqueue.rb"
 #require "filerenamer/manipulation/mkdirp.rb" not prepare due to ambiguous behavior.
 #require "filerenamer/manipulation/rmdirp.rb" not prepare due to ambiguous behavior.
+require "filerenamer/filetreesimulator.rb"
 
 module FileRenamer; end
