@@ -19,8 +19,6 @@ class TC_Ln < Test::Unit::TestCase
   def setup
     FileUtils.cp_r(ORIG_DIR, TMP_DIR)
     @l00 = FileRenamer::Manipulation::Ln.new(FROM_FILE, TO_FILE)
-
-    #@l01 = FileRenamer::Manipulation::Ln.new(FROM_DIR, TO_DIR)
   end
 
   def teardown
@@ -43,17 +41,10 @@ class TC_Ln < Test::Unit::TestCase
 
   def test_vanishing_files
     assert_equal([], @l00.vanishing_files)
-
-    #assert_equal([], @l01.vanishing_files)
   end
 
   def test_appearing_files
     assert_equal([TO_FILE], @l00.appearing_files)
-
-    #assert_equal(
-    #  [ "#{TO_DIR}", "#{TO_DIR}/01", "#{TO_DIR}/02" ],
-    #  @l01.appearing_files
-    #)
   end
 
   def test_execute_with_io
@@ -66,18 +57,6 @@ class TC_Ln < Test::Unit::TestCase
     assert_equal(true , File.exist?(TO_FILE))
     assert_equal(2 , File::Stat.new(FROM_FILE).nlink)
 
-    #assert_equal(true , File.exist?(FROM_DIR))
-    #assert_equal(true , File.exist?(FROM_DIR + "/01"))
-    #assert_equal(true , File.exist?(FROM_DIR + "/02"))
-    #assert_equal(false, File.exist?(TO_DIR))
-    #io = StringIO.new
-    #@l01.execute(io)
-    #assert_equal(true , File.exist?(FROM_DIR))
-    #assert_equal(true , File.exist?(FROM_DIR + "/01"))
-    #assert_equal(true , File.exist?(FROM_DIR + "/02"))
-    #assert_equal(true , File.exist?(TO_DIR))
-    #assert_equal(true , File.exist?(TO_DIR + "/01"))
-    #assert_equal(true , File.exist?(TO_DIR + "/02"))
   end
 
   def test_execute_without_io
@@ -87,21 +66,19 @@ class TC_Ln < Test::Unit::TestCase
     assert_equal(true , File.exist?(FROM_FILE))
     assert_equal(true , File.exist?(TO_FILE))
 
-    #assert_equal(true , File.exist?(FROM_DIR))
-    #assert_equal(true , File.exist?(FROM_DIR + "/01"))
-    #assert_equal(true , File.exist?(FROM_DIR + "/02"))
-    #assert_equal(false, File.exist?(TO_DIR))
-    #@l01.execute
-    #assert_equal(true , File.exist?(FROM_DIR))
-    #assert_equal(true , File.exist?(FROM_DIR + "/01"))
-    #assert_equal(true , File.exist?(FROM_DIR + "/02"))
-    #assert_equal(true , File.exist?(TO_DIR))
-    #assert_equal(true , File.exist?(TO_DIR + "/01"))
-    #assert_equal(true , File.exist?(TO_DIR + "/02"))
   end
 
   def test_to_s
     assert_equal("ln #{FROM_FILE} #{TO_FILE}", @l00.to_s)
+  end
+
+  def test_equal
+    assert_equal(false, @l00 == @l01)
+    assert_equal(false, @l01 == @l00)
+    assert_equal(false,
+                 @l00 == FileRenamer::Manipulation::Mv.new(FROM_FILE, TO_FILE))
+    assert_equal(true ,
+                 @l00 == FileRenamer::Manipulation::Ln.new(FROM_FILE, TO_FILE))
   end
 
 end

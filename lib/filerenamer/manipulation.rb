@@ -5,6 +5,8 @@
 #
 #
 class FileRenamer::Manipulation
+
+  attr_reader :files
   
   class NotImplementedError < Exception; end
   class ArgumentError < Exception; end
@@ -29,6 +31,12 @@ class FileRenamer::Manipulation
   def to_s
     #[self::UNIX_COMMAND, *@files].join(" ")
     raise NotImplementedError
+  end
+
+  def ==(other)
+    return false unless self.class == other.class
+    return false unless self.files == other.files
+    return true
   end
 
   private

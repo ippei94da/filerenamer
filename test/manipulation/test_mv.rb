@@ -7,14 +7,20 @@ require "stringio"
 #require "test/unit"
 #require "pkg/klass.rb"
 
-class TC_Mkdirp < Test::Unit::TestCase
-  ORIG_DIR = "test/manipulation/mkdirp/orig"
-  TMP_DIR = "test/manipulation/mkdirp/tmp"
-  DIR = "#{TMP_DIR}/00"
+class TC_Mv < Test::Unit::TestCase
+  ORIG_DIR = "test/manipulation/mv/orig"
+  TMP_DIR = "test/manipulation/mv/tmp"
+  FROM_FILE = "#{TMP_DIR}/00"
+  TO_FILE ="#{TMP_DIR}/01"
+
+  FROM_DIR = "#{TMP_DIR}/dir00"
+  TO_DIR ="#{TMP_DIR}/dir01"
 
   def setup
     FileUtils.cp_r(ORIG_DIR, TMP_DIR)
-    @m00 = FileRenamer::Manipulation::Mkdirp.new(DIR)
+    @m00 = FileRenamer::Manipulation::Mv.new(FROM_FILE, TO_FILE)
+
+    @m01 = FileRenamer::Manipulation::Mv.new(FROM_DIR, TO_DIR)
   end
 
   def teardown
@@ -22,40 +28,43 @@ class TC_Mkdirp < Test::Unit::TestCase
   end
 
   def test_initialize
-    assert_raise(FileRenamer::Manipulation::Mkdirp::ArgumentError){
-      FileRenamer::Manipulation::Mkdirp.new
+    assert_raise(FileRenamer::Manipulation::Mv::ArgumentError){
+      FileRenamer::Manipulation::Mv.new
     }
-    assert_raise(FileRenamer::Manipulation::Mkdirp::ArgumentError){
-      FileRenamer::Manipulation::Mkdirp.new("#{TMP_DIR}/00")
+    assert_raise(FileRenamer::Manipulation::Mv::ArgumentError){
+      FileRenamer::Manipulation::Mv.new("#{TMP_DIR}/00")
     }
-    assert_raise(FileRenamer::Manipulation::Mkdirp::ArgumentError){
-      FileRenamer::Manipulation::Mkdirp.new("#{TMP_DIR}/00",
+    assert_raise(FileRenamer::Manipulation::Mv::ArgumentError){
+      FileRenamer::Manipulation::Mv.new("#{TMP_DIR}/00",
                                         "#{TMP_DIR}/01",
                                         "#{TMP_DIR}/02")
     }
   end
 
   def test_vanishing_files
-    assert_equal([], @m00.vanishing_files)
+    assert_equal([FROM_FILE], @m00.vanishing_files)
 
-    assert_equal([], @m01.vanishing_files)
+    assert_equal(
+      [ FROM_DIR, FROM_DIR + "/01", FROM_DIR + "/02", ],
+      @m01.vanishing_files
+    )
   end
 
   def test_appearing_files
     assert_equal([TO_FILE], @m00.appearing_files)
 
     assert_equal(
-      [ "#{TO_DIR}", "#{TO_DIR}/01", "#{TO_DIR}/02" ],
+      [ TO_DIR, TO_DIR + "/01", TO_DIR + "/02", ],
       @m01.appearing_files
     )
   end
 
   def test_execute_with_io
-    assert_equal(true , File.exist?(DIR))
+    assert_equal(true , File.exist?(FROM_FILE))
     assert_equal(false, File.exist?(TO_FILE))
     io = StringIO.new
     @m00.execute(io)
-    assert_equal(true , File.exist?(DIR))
+    assert_equal(false, File.exist?(FROM_FILE))
     assert_equal(true , File.exist?(TO_FILE))
 
     assert_equal(true , File.exist?(FROM_DIR))
@@ -64,19 +73,17 @@ class TC_Mkdirp < Test::Unit::TestCase
     assert_equal(false, File.exist?(TO_DIR))
     io = StringIO.new
     @m01.execute(io)
-    assert_equal(true , File.exist?(FROM_DIR))
-    assert_equal(true , File.exist?(FROM_DIR + "/01"))
-    assert_equal(true , File.exist?(FROM_DIR + "/02"))
+    assert_equal(false, File.exist?(FROM_DIR))
     assert_equal(true , File.exist?(TO_DIR))
     assert_equal(true , File.exist?(TO_DIR + "/01"))
     assert_equal(true , File.exist?(TO_DIR + "/02"))
   end
 
   def test_execute_without_io
-    assert_equal(true , File.exist?(DIR))
+    assert_equal(true , File.exist?(FROM_FILE))
     assert_equal(false, File.exist?(TO_FILE))
     @m00.execute
-    assert_equal(true , File.exist?(DIR))
+    assert_equal(false, File.exist?(FROM_FILE))
     assert_equal(true , File.exist?(TO_FILE))
 
     assert_equal(true , File.exist?(FROM_DIR))
@@ -84,16 +91,23 @@ class TC_Mkdirp < Test::Unit::TestCase
     assert_equal(true , File.exist?(FROM_DIR + "/02"))
     assert_equal(false, File.exist?(TO_DIR))
     @m01.execute
-    assert_equal(true , File.exist?(FROM_DIR))
-    assert_equal(true , File.exist?(FROM_DIR + "/01"))
-    assert_equal(true , File.exist?(FROM_DIR + "/02"))
+    assert_equal(false, File.exist?(FROM_DIR))
     assert_equal(true , File.exist?(TO_DIR))
     assert_equal(true , File.exist?(TO_DIR + "/01"))
     assert_equal(true , File.exist?(TO_DIR + "/02"))
   end
 
   def test_to_s
-    assert_equal("mkdir -p #{DIR} #{TO_FILE}", @m00.to_s)
+    assert_equal("mv #{FROM_FILE} #{TO_FILE}", @m00.to_s)
+  end
+
+  def test_equal
+    assert_equal(false, @m00 == @m01)
+    assert_equal(false, @m01 == @m00)
+    assert_equal(true ,
+                 @m00 == FileRenamer::Manipulation::Mv.new(FROM_FILE, TO_FILE))
+    assert_equal(true , 
+                 @m01 == FileRenamer::Manipulation::Mv.new(FROM_DIR, TO_DIR))
   end
 
 end
