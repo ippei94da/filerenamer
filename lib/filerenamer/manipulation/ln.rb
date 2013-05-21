@@ -1,10 +1,12 @@
 #! /usr/bin/env ruby
 # coding: utf-8
 
+require "find"
+
 # Abstract class for file manipulation.
 #
 #
-class FileRenamer::Manipulation::Mv < FileRenamer::Manipulation
+class FileRenamer::Manipulation::Ln < FileRenamer::Manipulation
 
   class NotImplementedError < Exception; end
   class ArgumentError < Exception; end
@@ -16,7 +18,7 @@ class FileRenamer::Manipulation::Mv < FileRenamer::Manipulation
 
   #Return a filename which is vanished after 'execute'.
   def vanishing_files
-    recursive_paths(@files[0])
+    []
   end
 
   #Return a filename which is generated after 'execute'.
@@ -27,12 +29,12 @@ class FileRenamer::Manipulation::Mv < FileRenamer::Manipulation
   #If io is nil, no output string.
   def execute(io = $stdio)
     io.puts to_s if io
-    FileUtils.mv(@files[0], @files[1])
+    FileUtils.ln(@files[0], @files[1])
   end
 
   #Return string like UNIX command.
   def to_s
-    "mv #{@files[0]} #{@files[1]}"
+    "ln #{@files[0]} #{@files[1]}"
   end
 
 end

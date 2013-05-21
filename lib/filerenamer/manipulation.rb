@@ -9,19 +9,16 @@ class FileRenamer::Manipulation
   class NotImplementedError < Exception; end
   class ArgumentError < Exception; end
 
-  NUM_ARGS = nil
-  UNIX_COMMAND = nil
-
   #
   def initialize(* files)
     raise NotImplementedError
   end
 
-  def vanishing_file
+  def vanishing_files
     raise NotImplementedError
   end
 
-  def appering_file
+  def appearing_files
     raise NotImplementedError
   end
 
@@ -30,7 +27,18 @@ class FileRenamer::Manipulation
   end
 
   def to_s
-    [self::UNIX_COMMAND, *@files].join(" ")
+    #[self::UNIX_COMMAND, *@files].join(" ")
+    raise NotImplementedError
+  end
+
+  private
+
+  def recursive_paths(path)
+    results = []
+    Find.find(path) do |child|
+      results << child
+    end
+    results
   end
 
 end
