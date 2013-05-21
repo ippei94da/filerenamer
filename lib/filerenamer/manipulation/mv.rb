@@ -9,8 +9,8 @@ class FileRenamer::Manipulation::Mv < FileRenamer::Manipulation
   class NotImplementedError < Exception; end
   class ArgumentError < Exception; end
 
-  #NUM_ARGS = 2
-  #UNIX_COMMAND = "mv"
+  NUM_ARGS = 2
+  UNIX_COMMAND = "mv"
   
   def initialize(*files)
     #raise NotImplementedError, "Not set NUM_ARGS" unless NUM_ARGS
@@ -27,13 +27,7 @@ class FileRenamer::Manipulation::Mv < FileRenamer::Manipulation
   end
 
   def execute(io)
-    puts to_s
-    raise NotImplementedError
   end
-
-  private
-  
-  def
 
 end
 

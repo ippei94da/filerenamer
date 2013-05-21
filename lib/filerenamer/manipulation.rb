@@ -9,8 +9,8 @@ class FileRenamer::Manipulation
   class NotImplementedError < Exception; end
   class ArgumentError < Exception; end
 
-  #NUM_ARGS = nil
-  #UNIX_COMMAND = nil
+  NUM_ARGS = nil
+  UNIX_COMMAND = nil
 
   #
   def initialize(* files)
@@ -26,12 +26,11 @@ class FileRenamer::Manipulation
   end
 
   def execute(flag_show = true)
-    puts to_s
     raise NotImplementedError
   end
 
   def to_s
-    [UNIX_COMMAND, *@files].join(" ")
+    [self::UNIX_COMMAND, *@files].join(" ")
   end
 
 end
