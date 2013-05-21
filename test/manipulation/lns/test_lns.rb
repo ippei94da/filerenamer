@@ -59,7 +59,6 @@ class TC_Lns < Test::Unit::TestCase
     io = StringIO.new
     @l00.execute(io)
     assert_equal(true , File.exist?(FROM_FILE))
-    assert_equal(true , File.exist?(TO_FILE))
     assert_equal(true , File.symlink?(TO_FILE))
 
     assert_equal(true , File.exist?(FROM_DIR))
@@ -71,7 +70,7 @@ class TC_Lns < Test::Unit::TestCase
     assert_equal(true , File.exist?(FROM_DIR))
     assert_equal(true , File.exist?(FROM_DIR + "/01"))
     assert_equal(true , File.exist?(FROM_DIR + "/02"))
-    assert_equal(true , File.exist?(TO_DIR))
+    #assert_equal(true , File.exist?(TO_DIR))
     assert_equal(true , File.symlink?(TO_DIR))
     #assert_equal(true , File.exist?(TO_DIR + "/01"))
     #assert_equal(true , File.exist?(TO_DIR + "/02"))
@@ -83,7 +82,7 @@ class TC_Lns < Test::Unit::TestCase
     @l00.execute
     #sleep 60
     assert_equal(true , File.exist?(FROM_FILE))
-    assert_equal(true , File.exist?(TO_FILE))
+    #assert_equal(true , File.exist?(TO_FILE))
     assert_equal(true , File.symlink?(TO_FILE))
 
     assert_equal(true , File.exist?(FROM_DIR))
@@ -94,7 +93,7 @@ class TC_Lns < Test::Unit::TestCase
     assert_equal(true , File.exist?(FROM_DIR))
     assert_equal(true , File.exist?(FROM_DIR + "/01"))
     assert_equal(true , File.exist?(FROM_DIR + "/02"))
-    assert_equal(true , File.exist?(TO_DIR))
+    #assert_equal(true , File.exist?(TO_DIR))
     assert_equal(true , File.symlink?(TO_DIR))
     #assert_equal(true , File.exist?(TO_DIR + "/01"))
     #assert_equal(true , File.exist?(TO_DIR + "/02"))

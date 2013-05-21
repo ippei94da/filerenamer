@@ -6,5 +6,6 @@ require "filerenamer/manipulation/mv.rb"
 require "filerenamer/manipulation/cp.rb"
 require "filerenamer/manipulation/ln.rb"
 require "filerenamer/manipulation/lns.rb"
+require "filerenamer/manipulation/mkdirp.rb"
 
 module FileRenamer; end
