@@ -10,10 +10,10 @@ class TC_ManipulationQueue < Test::Unit::TestCase
     @ms00 = ManipulationQueue.new
   end
 
-  def test_
-    TODO
-    @ms00.
-  end
+  #def test_
+  #  TODO
+  #  @ms00.
+  #end
 
 end
 

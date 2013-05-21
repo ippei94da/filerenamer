@@ -22,7 +22,7 @@ class TC_Mv < Test::Unit::TestCase
     FileUtils.rm_rf(TMP_DIR) if File.exist? TMP_DIR
   end
 
-  def test_initialize(* files)
+  def test_initialize
     assert_raise(FileRenamer::Manipulation::Mv::ArgumentError){
       FileRenamer::Manipulation::Mv.new
     }
@@ -62,7 +62,7 @@ class TC_Mv < Test::Unit::TestCase
   end
 
   def test_to_s
-    assert_equal("mv #{FROM_FILE} #{TO_FILE})
+    assert_equal("mv #{FROM_FILE} #{TO_FILE}", @m00.to_s)
   end
 
 end

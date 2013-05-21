@@ -9,14 +9,12 @@ class FileRenamer::Manipulation
   class NotImplementedError < Exception; end
   class ArgumentError < Exception; end
 
-  NUM_ARGS = nil
-  UNIX_COMMAND = nil
+  #NUM_ARGS = nil
+  #UNIX_COMMAND = nil
 
   #
   def initialize(* files)
-    raise NotImplementedError unless NUM_ARGS
-    raise ArgumentError unless files.size == NUM_ARGS
-    @files = files
+    raise NotImplementedError
   end
 
   def vanishing_file

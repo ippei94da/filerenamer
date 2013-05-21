@@ -4,39 +4,36 @@
 # Abstract class for file manipulation.
 #
 #
-class FileRenamer::Manipulation::Mv
-  TODO
-  
+class FileRenamer::Manipulation::Mv < FileRenamer::Manipulation
+
   class NotImplementedError < Exception; end
   class ArgumentError < Exception; end
 
-  NUM_ARGS = nil
-  UNIX_COMMAND = nil
-
-  #
-  def initialize(* files)
-    raise NotImplementedError unless NUM_ARGS
+  #NUM_ARGS = 2
+  #UNIX_COMMAND = "mv"
+  
+  def initialize(*files)
+    #raise NotImplementedError, "Not set NUM_ARGS" unless NUM_ARGS
     raise ArgumentError unless files.size == NUM_ARGS
     @files = files
   end
 
   def vanishing_file
-    raise NotImplementedError
+    @files[0]
   end
 
   def appering_file
-    raise NotImplementedError
+    @files[1]
   end
 
-  #if io is set, to_s 
   def execute(io)
     puts to_s
     raise NotImplementedError
   end
 
-  def to_s
-    [UNIX_COMMAND, *@files].join(" ")
-  end
+  private
+  
+  def
 
 end
 
