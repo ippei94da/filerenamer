@@ -6,7 +6,8 @@ require "helper"
 #require "pkg/klass.rb"
 
 class FileRenamer::FileTreeSimulator
-  attr_reader :files
+  attr_accessor :files
+  public :reflect_from_filesystem
 end
 
 class TC_FileTreeSimulator < Test::Unit::TestCase
@@ -32,39 +33,39 @@ class TC_FileTreeSimulator < Test::Unit::TestCase
 
     @fts.mv("test/filetreesimulator/00", "test/filetreesimulator/01")
     assert_equal( {
-      "test/filetreesimulator/00" => false,
-      "test/filetreesimulator/01" => :file
+      "#{ENV['PWD']}/test/filetreesimulator/00" => false,
+      "#{ENV['PWD']}/test/filetreesimulator/01" => :file
       },
       @fts.files
     )
 
     @fts.mv("test/filetreesimulator/dir00", "test/filetreesimulator/dir01")
     assert_equal( {
-      "test/filetreesimulator/00" => false,
-      "test/filetreesimulator/01" => :file,
-      "test/filetreesimulator/dir00" => false,
-      "test/filetreesimulator/dir00/01" => false,
-      "test/filetreesimulator/dir00/02" => false,
-      "test/filetreesimulator/dir01" => :directory,
-      "test/filetreesimulator/dir01/01" => :file,
-      "test/filetreesimulator/dir01/02" => :file,
+      "#{ENV['PWD']}/test/filetreesimulator/00" => false,
+      "#{ENV['PWD']}/test/filetreesimulator/01" => :file,
+      "#{ENV['PWD']}/test/filetreesimulator/dir00" => false,
+      "#{ENV['PWD']}/test/filetreesimulator/dir00/01" => false,
+      "#{ENV['PWD']}/test/filetreesimulator/dir00/02" => false,
+      "#{ENV['PWD']}/test/filetreesimulator/dir01" => :directory,
+      "#{ENV['PWD']}/test/filetreesimulator/dir01/01" => :file,
+      "#{ENV['PWD']}/test/filetreesimulator/dir01/02" => :file,
       },
       @fts.files
     )
 
     @fts.mv("test/filetreesimulator/dir01", "test/filetreesimulator/dir02")
     assert_equal( {
-      "test/filetreesimulator/00" => false,
-      "test/filetreesimulator/01" => :file,
-      "test/filetreesimulator/dir00" => false,
-      "test/filetreesimulator/dir00/01" => false,
-      "test/filetreesimulator/dir00/02" => false,
-      "test/filetreesimulator/dir01" => false,
-      "test/filetreesimulator/dir01/01" => false,
-      "test/filetreesimulator/dir01/02" => false,
-      "test/filetreesimulator/dir02" => :directory,
-      "test/filetreesimulator/dir02/01" => :file,
-      "test/filetreesimulator/dir02/02" => :file,
+      "#{ENV['PWD']}/test/filetreesimulator/00" => false,
+      "#{ENV['PWD']}/test/filetreesimulator/01" => :file,
+      "#{ENV['PWD']}/test/filetreesimulator/dir00" => false,
+      "#{ENV['PWD']}/test/filetreesimulator/dir00/01" => false,
+      "#{ENV['PWD']}/test/filetreesimulator/dir00/02" => false,
+      "#{ENV['PWD']}/test/filetreesimulator/dir01" => false,
+      "#{ENV['PWD']}/test/filetreesimulator/dir01/01" => false,
+      "#{ENV['PWD']}/test/filetreesimulator/dir01/02" => false,
+      "#{ENV['PWD']}/test/filetreesimulator/dir02" => :directory,
+      "#{ENV['PWD']}/test/filetreesimulator/dir02/01" => :file,
+      "#{ENV['PWD']}/test/filetreesimulator/dir02/02" => :file,
       },
       @fts.files
     )
@@ -86,6 +87,42 @@ class TC_FileTreeSimulator < Test::Unit::TestCase
   end
 
   def test_rm
+  end
+
+  def test_reflect_from_filesystem
+    @fts.reflect_from_filesystem("test/filetreesimulator")
+    assert_equal(
+      {
+        "#{ENV['PWD']}/test/filetreesimulator" => :directory,
+        "#{ENV['PWD']}/test/filetreesimulator/00" => :file,
+        "#{ENV['PWD']}/test/filetreesimulator/dir00" => :directory,
+        "#{ENV['PWD']}/test/filetreesimulator/dir00/01" => :file,
+        "#{ENV['PWD']}/test/filetreesimulator/dir00/02" => :file,
+      },
+      @fts.files
+    )
+
+    @fts.reflect_from_filesystem("test/filetreesimulator/not_exist")
+    assert_equal(
+      {
+        "#{ENV['PWD']}/test/filetreesimulator" => :directory,
+        "#{ENV['PWD']}/test/filetreesimulator/00" => :file,
+        "#{ENV['PWD']}/test/filetreesimulator/dir00" => :directory,
+        "#{ENV['PWD']}/test/filetreesimulator/dir00/01" => :file,
+        "#{ENV['PWD']}/test/filetreesimulator/dir00/02" => :file,
+        "#{ENV['PWD']}/test/filetreesimulator/not_exist" => false,
+      },
+      @fts.files
+    )
+
+    @fts.files = { "#{ENV['PWD']}/test/filetreesimulator" => false }
+    @fts.reflect_from_filesystem("test/filetreesimulator")
+    assert_equal(
+      { "#{ENV['PWD']}/test/filetreesimulator" => false },
+      @fts.files
+    )
+
+
   end
 
 

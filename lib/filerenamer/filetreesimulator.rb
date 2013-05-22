@@ -16,6 +16,9 @@ class FileRenamer::FileTreeSimulator
   #mv, rename file.
   #Overwrite if t_file exists.
   def mv(f_path, t_path)
+    f_path = File::expand_path f_path
+    t_path = File::expand_path t_path
+
     reflect_from_filesystem(f_path)
     reflect_from_filesystem(t_path)
 
@@ -23,8 +26,11 @@ class FileRenamer::FileTreeSimulator
       raise NoEntryError, "No such file or directory - #{f_path}"
     end
 
-    @files[t_path] = @files[f_path]
-    @files[f_path] = false
+    @files.keys.select{ |path| path =~ /^#{fpath}/} do |path|
+      pp path
+      #@files[t_path] = @files[f_path]
+      #@files[f_path] = false
+    end
   end
 
   def cp(f_path, t_path)
@@ -48,22 +54,18 @@ class FileRenamer::FileTreeSimulator
   private
 
   def reflect_from_filesystem(path)
-    if @files[path]
-      return
-    else
-      if File.exist? path
-        @files[path] = File.ftype(path).intern
-      else
-        @files[path] = false
-      end
+    path = File::expand_path path
+    return if @files.has_key? path # already fetched; do nothing.
 
-      if @files[path] == :directory
-        Dir.glob(path).each do |subdir|
-          reflect_from_filesystem subdir
-        end
+    if File.exist? path
+      Find.find(path) do |fpath|
+        @files[fpath] = File.ftype(fpath).intern
       end
+    else
+      @files[path] = false
     end
   end
+
 
 end
 
