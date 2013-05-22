@@ -5,33 +5,35 @@
 #
 #
 class FileRenamer::FileTreeSimulator
+
+  class NoEntryError < Exception; end
+
   #
   def initialize
     @files = {}
   end
 
-  def mv(f_file, t_file)
-    reflect_from_filesystem(f_file)
-    reflect_from_filesystem(t_file)
+  #mv, rename file.
+  #Overwrite if t_file exists.
+  def mv(f_path, t_path)
+    reflect_from_filesystem(f_path)
+    reflect_from_filesystem(t_path)
 
-    unless @files[f_file]
-      raise Errno::ENOENT, "No such file or directory - #{f_file}"
+    unless @files[f_path]
+      raise NoEntryError, "No such file or directory - #{f_path}"
     end
-    t_file が存在しても、普通に FileUtils.mv すると上書きしてしまう。
 
-    File.ftype() #=> "file", "directory", etc.
-
-    @files[t_file] = @files[f_file]
-    @files[f_file] = false
+    @files[t_path] = @files[f_path]
+    @files[f_path] = false
   end
 
-  def cp(f_file, t_file)
+  def cp(f_path, t_path)
   end
 
-  def ln(f_file, t_file)
+  def ln(f_path, t_path)
   end
 
-  def ln_s(f_file, t_file)
+  def ln_s(f_path, t_path)
   end
 
   def mkdir_p(dir)
@@ -40,19 +42,25 @@ class FileRenamer::FileTreeSimulator
   def rmdir_p(dir)
   end
 
-  def rm(file)
+  def rm(path)
   end
 
   private
 
-  def reflect_from_filesystem(file)
-    if @files[file]
+  def reflect_from_filesystem(path)
+    if @files[path]
       return
     else
-      if File.exist? file
-        @files[file] = File.ftype(file).intern
+      if File.exist? path
+        @files[path] = File.ftype(path).intern
       else
-        @files[file] = false
+        @files[path] = false
+      end
+
+      if @files[path] == :directory
+        Dir.glob(path).each do |subdir|
+          reflect_from_filesystem subdir
+        end
       end
     end
   end

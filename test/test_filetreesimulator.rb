@@ -41,7 +41,13 @@ class TC_FileTreeSimulator < Test::Unit::TestCase
     @fts.mv("test/filetreesimulator/dir00", "test/filetreesimulator/dir01")
     assert_equal( {
       "test/filetreesimulator/00" => false,
-      "test/filetreesimulator/01" => :dir
+      "test/filetreesimulator/01" => :file,
+      "test/filetreesimulator/dir00" => false,
+      "test/filetreesimulator/dir00/01" => false,
+      "test/filetreesimulator/dir00/02" => false,
+      "test/filetreesimulator/dir01" => :directory,
+      "test/filetreesimulator/dir01/01" => :file,
+      "test/filetreesimulator/dir01/02" => :file,
       },
       @fts.files
     )
@@ -49,8 +55,16 @@ class TC_FileTreeSimulator < Test::Unit::TestCase
     @fts.mv("test/filetreesimulator/dir01", "test/filetreesimulator/dir02")
     assert_equal( {
       "test/filetreesimulator/00" => false,
-      "test/filetreesimulator/01" => false,
-      "test/filetreesimulator/02" => :dir
+      "test/filetreesimulator/01" => :file,
+      "test/filetreesimulator/dir00" => false,
+      "test/filetreesimulator/dir00/01" => false,
+      "test/filetreesimulator/dir00/02" => false,
+      "test/filetreesimulator/dir01" => false,
+      "test/filetreesimulator/dir01/01" => false,
+      "test/filetreesimulator/dir01/02" => false,
+      "test/filetreesimulator/dir02" => :directory,
+      "test/filetreesimulator/dir02/01" => :file,
+      "test/filetreesimulator/dir02/02" => :file,
       },
       @fts.files
     )
