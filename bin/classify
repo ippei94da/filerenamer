@@ -93,6 +93,7 @@ op = FileRenamer::OptionParser.new
 op.on("-k"       , "--kakasi" , "Japanese yomi dirname. (Using kakasi)"){ OPTIONS[:kakasi] = true}
 op.on("-u"       , "--unite"  , "Unite group of chars. E.g., t -> T."){   OPTIONS[:unite] = true}
 op.on("-l number", "--length=number", "Indicate length of initial characters. Default number = 1."){|v| OPTIONS[:length] = v.to_i}
+op.on("-a number", "--auto-length=number", "Automatically decided length for each filename. 'number' is identificatio length."){|v| OPTIONS[:auto] = v.to_i}
 op.on("-s"       , "--shorten", "Shorten filename, duplicated part with the dirname."){ OPTIONS[:shorten] = true}
 op.parse!(ARGV)
 
