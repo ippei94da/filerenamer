@@ -3,7 +3,7 @@
 == Master (for 0.1.0)
 
 * FileRenamer::Commander to FileRenamer::ManipulationStocker
-* 
+* classify -u to lowercase.
 
 == Version 0.0.6 [2013-04-18] released
 * Add --unite option to bin/classify, which unite t and T into T.
