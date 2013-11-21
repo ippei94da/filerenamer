@@ -84,6 +84,7 @@ UNITE_CHARS = {
   ##"ヵ"=>"か", "ヶ"=>"け",
 }
 
+require "pp"
 gem "builtinextension"
 require "string/escapezsh.rb"
 require "filerenamer.rb"
@@ -95,6 +96,7 @@ op.on("-u"       , "--unite"  , "Unite group of chars. E.g., t -> T."){   OPTION
 op.on("-l number", "--length=number", "Indicate length of initial characters. Default number = 1."){|v| OPTIONS[:length] = v.to_i}
 op.on("-a number", "--auto-length=number", "Automatically decided length for each filename. 'number' is identificatio length."){|v| OPTIONS[:auto] = v.to_i}
 op.on("-s"       , "--shorten", "Shorten filename, duplicated part with the dirname."){ OPTIONS[:shorten] = true}
+op.on("-4"       , "--2x2", "Classify to 2layer-directories of 2chars. Implying 'shorten'."){ OPTIONS[:two_two] = true}
 op.parse!(ARGV)
 
 OPTIONS[:length] ||= 1
@@ -120,6 +122,12 @@ fr.execute do |filename|
 
   if OPTIONS[:shorten]
     filename = filename[OPTIONS[:length]..(-1)]
+  end
+
+  if OPTIONS[:two_two]
+    next if filename.size <= 4
+    dirname = filename[0..1] + "/" + filename[2..3]
+    filename = filename[4..-1]
   end
 
   dirname + "/" + filename
