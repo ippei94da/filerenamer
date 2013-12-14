@@ -95,6 +95,7 @@ op.on("-k"       , "--kakasi" , "Japanese yomi dirname. (Using kakasi)"){ OPTION
 op.on("-u"       , "--unite"  , "Unite group of chars. E.g., t -> T."){   OPTIONS[:unite] = true}
 op.on("-l number", "--length=number", "Indicate length of initial characters. Default number = 1."){|v| OPTIONS[:length] = v.to_i}
 op.on("-a number", "--auto-length=number", "Automatically decided length for each filename. 'number' is identificatio length."){|v| OPTIONS[:auto] = v.to_i}
+#op.on("-g length", "--greed=length", "Greed matching for directory at least of the length."){|v| OPTIONS[:greed] = v.to_i}
 op.on("-s"       , "--shorten", "Shorten filename, duplicated part with the dirname."){ OPTIONS[:shorten] = true}
 op.on("-4"       , "--2x2", "Classify to 2layer-directories of 2chars. Implying 'shorten'."){ OPTIONS[:two_two] = true}
 op.parse!(ARGV)
