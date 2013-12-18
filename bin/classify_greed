@@ -1,0 +1,61 @@
+#! /usr/bin/env ruby
+# coding: utf-8
+
+##op.on("-g length", "--greed=length", "Greed matching for directory at least of the length."){|v| OPTIONS[:greed] = v.to_i}
+
+require "pp"
+gem "builtinextension"
+require "string/escapezsh.rb"
+require "filerenamer.rb"
+
+class Array
+  # return an index of the first mismatch of strings.
+  def mismatch_index
+    index = 0
+    for index in 0..(self.min_by{|item| item.size}) do
+      self.each do |char_id|
+        pp self[0][char_id], self[index][char_id]
+        #break if self[0] != self[index]
+      end
+    end
+    return index
+  end
+end
+
+#p ['abc', 'abd', 'abe'].mismatch_index
+#p ['abc', 'abd', 'ab'].mismatch_index
+#p ['abcd', 'abce', 'abcde'].mismatch_index
+p ['biblio', 'bin'].mismatch_index
+exit
+
+OPTIONS = {}
+op = FileRenamer::OptionParser.new
+op.on("-l number", "--length=number", "Indicate length of initial characters. Default number = 1."){|v| OPTIONS[:length] = v.to_i}
+op.parse!(ARGV)
+OPTIONS[:length] ||= 1
+
+files = ARGV
+files = Dir.glob("*").sort if files.empty?
+
+#pp files
+group_strs = files.map {|str| str[0...(OPTIONS[:length])]}.uniq
+group_strs.each do |str|
+  files = Dir.glob("#{str}*")
+  #pp files
+  pp index = files.mismatch_index
+  files.each do |old_filename|
+    dirname = old_filename[0...index]
+    filename= old_filename[index...(old_filename.size)]
+    pp dirname, filename
+  end
+  exit
+end
+
+
+#
+#fr = FileRenamer::Commander.new(op.options, ARGV)
+#fr.execute do |filename|
+#  next if filename.size <= OPTIONS[:length]
+#
+#  dirname + "/" + filename
+#end
