@@ -4,7 +4,7 @@
 * classify -u to lowercase.
 * classify -4 to 2chars and 2layer-directoriess.
 * renhash -C to use various hash commmands not sha256sum.
-* classify_greed is added.
+* Add bin/classify_greed.
 
 == Version 0.0.6 [2013-04-18] released
 * Add --unite option to bin/classify, which unite t and T into T.
