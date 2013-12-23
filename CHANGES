@@ -1,6 +1,8 @@
 = filerenamer Changelog
 
-== Master (for 0.0.7)
+== Master (for 0.0.8)
+
+== Version 0.0.7 [2013-12-20] released
 * classify -u to lowercase.
 * classify -4 to 2chars and 2layer-directoriess.
 * renhash -C to use various hash commmands not sha256sum.
