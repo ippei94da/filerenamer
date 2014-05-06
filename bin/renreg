@@ -50,6 +50,9 @@ fr.execute do |filename|
   #
   new_name.gsub!(' ', '_'); new_name.gsub!('　', '_');
   #
+  new_name.gsub!('～', '〜');
+  new_name.gsub!('－', '-');
+  #
   # 年号変換
   while (/平成(\d\d)年/ =~ new_name)
     new_name.sub!( /平成(\d\d)年/, (1988 + ($1.to_i)).to_s + "年")
