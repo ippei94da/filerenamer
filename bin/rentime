@@ -3,6 +3,16 @@
 
 require "pp"
 require "filerenamer.rb"
+require "optparse"
+
+## option analysis
+OPTIONS = {}
+op = OptionParser.new
+#op.banner = [
+#    "Usage: #{File.basename("#{__FILE__}")}",
+#].join("\n")
+op.on("-p"    , "--preserve"    , "Preserve old name"){OPTIONS[:preserve] = true}
+op.parse!(ARGV)
 
 op = FileRenamer::OptionParser.new
 op.parse!(ARGV)
@@ -10,9 +20,12 @@ op.parse!(ARGV)
 fr = FileRenamer::Commander.new(op.options, ARGV)
 fr.execute do |filename|
   extname = File.extname filename
+  old_base = filename.sub(/#{extname}$/, "")
   dirname = File.dirname filename
   date = File.mtime(filename)
 
-  newname = dirname + date.strftime("/%Y%m%d-%H%M%S") + extname
+  new_basename = dirname + date.strftime("/%Y%m%d-%H%M%S")
+  new_basename += "-#{old_base}" if OPTIONS[:preserve]
+  newname = new_basename + extname
   newname
 end
