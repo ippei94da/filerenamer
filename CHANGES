@@ -2,6 +2,7 @@
 
 == Master (for 0.0.8)
 * Add --preserve option to bin/rentime.
+* Small change of --help of bin/classify.
 
 == Version 0.0.7 [2013-12-20] released
 * classify -u to lowercase.
