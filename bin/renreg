@@ -39,13 +39,14 @@ fr.execute do |filename|
   new_name.gsub!('$', '＄'); new_name.gsub!('%', '％'); new_name.gsub!('&', '＆');
   new_name.gsub!("'", '’'); new_name.gsub!('(', '（'); new_name.gsub!(')', '）');
   new_name.gsub!('*', '＊'); new_name.gsub!('+', '＋'); new_name.gsub!(',', '，');
-  new_name.gsub!('-', '-'); new_name.gsub!('/', '／');
+  new_name.gsub!('-', '-');
   new_name.gsub!(':', '：'); new_name.gsub!(';', '；'); new_name.gsub!('<', '＜');
   new_name.gsub!('=', '＝'); new_name.gsub!('>', '＞'); new_name.gsub!('?', '？');
   new_name.gsub!('@', '＠'); new_name.gsub!('[', '［'); new_name.gsub!("\\", '＼');
   new_name.gsub!(']', '］'); new_name.gsub!('^', '＾'); new_name.gsub!('_', '_');
   new_name.gsub!('`', '｀'); new_name.gsub!('{', '｛'); new_name.gsub!('|', '｜');
   new_name.gsub!('}', '｝'); new_name.gsub!('~', '〜');
+  #new_name.gsub!('/', '／');
   #new_name.gsub!('.', '．'); 
   #
   new_name.gsub!(' ', '_'); new_name.gsub!('　', '_');
