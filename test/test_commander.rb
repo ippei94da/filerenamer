@@ -106,7 +106,6 @@ class TC_Commander < Test::Unit::TestCase
     assert_equal(true, FileTest.exist?(A_0))
     assert_equal(true, FileTest.exist?(A_1))
     FileUtils.rm(A_1)
-    #
     correct = 
       "Enable files:\n" +
       "  cp -r #{A_0} #{A_1}\n" +
