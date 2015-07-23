@@ -44,6 +44,14 @@ module FileRenamer
     class NoRenameRuleError < Exception; end
     class OptionError < Exception; end
 
+    def self.files(strs)
+      if strs.empty?
+        return Dir::glob("*").sort
+      else
+        return strs
+      end
+    end
+
     #:yes と :no が両方 true ならば例外。
     #:copy, :move, :hardlink, :symlink のうち、1つ以下が true。
     #全て nil ならば :move が true になる。
@@ -82,8 +90,7 @@ module FileRenamer
           "Conflict options: --quiet and --no"
       end
 
-      @files = files
-      @files = Dir::glob("*").sort if files.empty?
+      @files = self.class.files(files)
     end
 
     # 変更される名前のリストを表示し、ユーザの指示に従って実行する。

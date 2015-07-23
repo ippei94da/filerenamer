@@ -3,6 +3,7 @@
 
 require 'helper'
 
+require "pp"
 require "test/unit"
 require "filerenamer/commander.rb"
 require "stringio"
@@ -33,6 +34,11 @@ class TC_Commander < Test::Unit::TestCase
 
     options = {:copy => true, :yes => true}
     @fr01 = FileRenamer::Commander.new(options, [])
+  end
+
+  def test_self_files
+    #pp FileRenamer::Commander.files([])
+    #pp FileRenamer::Commander.files(['a', 'b'])
   end
 
   def test_initialize

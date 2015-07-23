@@ -1,9 +1,13 @@
 = filerenamer Changelog
 
-== Master (for 0.0.8)
+== Master (for 0.0.9)
+
+== Version 0.0.8 [2015-07-23] released
 * Add --preserve option to bin/rentime.
 * Small change of --help of bin/classify.
 * renreg: '/' to '／' is ignored.
+* Add automatic detection zero-padding width to bin/rennum.
+* Add --random option to bin/rennum.
 
 == Version 0.0.7 [2013-12-20] released
 * classify -u to lowercase.

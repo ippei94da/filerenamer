@@ -1,11 +1,13 @@
 #! /usr/bin/ruby -w
 # coding: utf-8
 
+# rename using serial number.
 # 拡張子は保存
 # -i オプションで開始番号を指定
 # -p : preserve old name 元のファイル名を残す。foo.txt -> 001-foo.txt
-require "filerenamer/commander.rb"
-require "filerenamer/optionparser.rb"
+require 'pp'
+require 'filerenamer/commander.rb'
+require 'filerenamer/optionparser.rb'
 
 
 OPTIONS = {}
@@ -16,18 +18,28 @@ op.on("-i num", "--initial", "Indicate initial number."){ |val|
 op.on("-p", "--preserve", "Preserve old name."){
   OPTIONS[:preserve] = true
 }
+op.on("-r", "--random", "Random number."){
+  OPTIONS[:random] = true
+}
 op.parse!(ARGV)
 
 OPTIONS[:init] ||= 0
 
-fr = FileRenamer::Commander.new(op.options, ARGV)
+files = FileRenamer::Commander.files(ARGV)
+last_number = OPTIONS[:init].to_i +  files.size - 1
+width = last_number.to_s.size
+
+files.shuffle!  if OPTIONS[:random]
+
+fr = FileRenamer::Commander.new(op.options, files)
+
 fr.execute do |filename|
   @counter ||= OPTIONS[:init]
   if (OPTIONS[:preserve])
-    new_name = sprintf("%03d-%s", @counter, filename)
+    new_name = sprintf("%0#{width}d-%s", @counter, filename)
   else 
     extention = File.extname(filename)
-    new_name = sprintf("%03d%s", @counter, extention)
+    new_name = sprintf("%0#{width}d%s", @counter, extention)
   end
   @counter += 1
   new_name
