@@ -361,13 +361,5 @@ class TC_Commander < Test::Unit::TestCase
     assert_equal([], @fr00.paths("baz.txt"))
     assert_equal(["/foo", "/foo/bar"], @fr00.paths("/foo/bar/baz.txt"))
   end
-
-  #undef test_initialize
-  #undef test_make_new_names
-  #undef test_check_new_names
-  #undef test_ask_yes?
-  #undef test_execute
-  #undef test_run
-
 end
 
