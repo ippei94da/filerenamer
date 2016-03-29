@@ -25,6 +25,7 @@ module FileRenamer
       on("-m", "--move"    , "Move mode.(default)"   ){@options[:move]    = true}
       on("-h", "--hardlink", "Hardlink mode."        ){@options[:hardlink]= true}
       on("-s", "--symlink" , "Symlink mode."         ){@options[:symlink] = true}
+      on("-g", "--git"     , "Git-mv mode."          ){@options[:git] = true}
       on("-q", "--quiet"   , "Quiet mode. Forced non-interactive."){
         @options[:quiet] = true
         #このオプションが設定されているときは強制的に --yes として扱われる。

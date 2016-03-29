@@ -2,6 +2,8 @@
 
 == Master (for 0.0.9)
 
+* Add --git option
+
 == Version 0.0.8 [2015-07-23] released
 * Add --preserve option to bin/rentime.
 * Small change of --help of bin/classify.

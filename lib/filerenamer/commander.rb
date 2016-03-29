@@ -53,7 +53,7 @@ module FileRenamer
     end
 
     #:yes と :no が両方 true ならば例外。
-    #:copy, :move, :hardlink, :symlink のうち、1つ以下が true。
+    #:copy, :move, :hardlink, :symlink, :git のうち、1つ以下が true。
     #全て nil ならば :move が true になる。
     #:quiet が true ならば自動的に :yes が立てられる。
     #:quiet が true で :no も true ならば例外。
@@ -66,7 +66,7 @@ module FileRenamer
       end
 
       fileProcessModes = []
-      [:move, :copy, :hardlink, :symlink].each do |mode|
+      [:move, :copy, :hardlink, :symlink, :git].each do |mode|
         fileProcessModes << mode if @options[mode]
       end
       # 1つもなければ :move に。
@@ -80,6 +80,7 @@ module FileRenamer
       @command = "cp -r"  if @options[:copy]
       @command = "ln"     if @options[:hardlink]
       @command = "ln -s"  if @options[:symlink]
+      @command = "git mv" if @options[:git]
 
       # :quiet ならば自動的に :yes
       @options[:yes] = true if @options[:quiet]
