@@ -1,6 +1,8 @@
 = filerenamer Changelog
 
-== Master (for 0.0.9)
+<!-- Master -->
+
+== Version 0.0.9 [2016-07-12] released
 
 * Add --git option
 
