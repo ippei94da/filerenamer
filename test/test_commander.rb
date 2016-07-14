@@ -349,7 +349,8 @@ class TC_Commander < Test::Unit::TestCase
     assert_equal(false, result)
   end
 
-  def test_run
+  def test_rename
+    TODO
     # ディレクトリ消去が必要な場合
     FileUtils.rm("tmp1/dir/a1.txt") if FileTest.exist?("tmp1/dir/a1.txt")
     FileUtils.rm("tmp2/dir/a1.txt") if FileTest.exist?("tmp2/dir/a1.txt")
@@ -382,6 +383,33 @@ class TC_Commander < Test::Unit::TestCase
     FileUtils.rm("tmp2/dir/a1.txt")
     FileUtils.rmdir("tmp2/dir")
     FileUtils.rmdir("tmp2")
+  end
+
+  def test_transplant
+    src_root_dir = "test/commander"
+    src_dir   = "#{src_root_dir}/a/b/c"
+    src_file1 = "#{src_dir}/1.file"
+    src_file2 = "#{src_dir}/2.file"
+    tgt_dir = "test/commander/d"
+    tgt_file1 = "#{tgt_dir}/1.file"
+    tgt_file2 = "#{tgt_dir}/2.file"
+    Dir.mkdir_p src_dir
+    File.open(src_file1, 'w').close
+    File.open(src_file2, 'w').close
+
+    @fr00.transplant(src_file1, tgt_file1)
+    assert_equal(false, FileTest.exist?(src_file1))
+    assert_equal(true , FileTest.exist?(src_file2))
+    assert_equal(true , FileTest.exist?(tgt_file1))
+    assert_equal(false, FileTest.exist?(tgt_file2))
+
+    @fr00.transplant(src_file2, tgt_file2)
+    assert_equal(false, FileTest.exist?(src_file1))
+    assert_equal(false, FileTest.exist?(src_file2))
+    assert_equal(true , FileTest.exist?(tgt_file1))
+    assert_equal(true , FileTest.exist?(tgt_file2))
+
+    assert_equal(false, FileTest.exist?(src_root_dir))
   end
 
   def test_paths

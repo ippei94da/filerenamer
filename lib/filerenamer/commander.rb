@@ -193,30 +193,22 @@ module FileRenamer
     #def run(old, new)
     def rename(conversions)
 
-      #pp Dir.tmpdir
-      Dir.mktmpdir do |tmpdir|
-        tmpdir
+      tmpdir = Dir.mktmpdir('rename', './')
 
-      end
+      int_paths = {} #intermediate paths
+      conversions.each { |old, new| int_paths[old] = tmpdir + '/' + old }
+      int_paths.each   { |old, int| transplant(old, int) }
+      conversions.each { |old, new| transplant(int_paths[old], new) }
 
-      tempdir パス取得
-      tempdir さくせい
-      conversions.keys をすべて、パスのディレクトリ構成を維持したまま tempdir するための
-      int_paths を生成
+      Dir.rmdir tmpdir
+    end
 
-      int_paths にしたがって tempdir に移動
-      int_paths から conversions.values にしたがって、移動
-
-
-      conversions.each { |old, new| run(old, new) }
-
-
+    def transplant(old, new)
       # 変換先のディレクトリがなければ生成
-      paths(new).each do |directory|
-        unless FileTest.exist?(directory)
-          puts "  make directory: #{directory}" unless @options[:quiet]
-          FileUtils.mkdir_p(directory)
-        end
+      new_dir = File.dirname(new)
+      unless FileTest.exist?(new_dir)
+        puts "  make directory: #{new_dir}" unless @options[:quiet]
+        FileUtils.mkdir_p(new_dir)
       end
 
       # 変換の実行
@@ -225,12 +217,10 @@ module FileRenamer
       system(command)
 
       # 変換元のディレクトリが空になっていれば削除
-      dirs = paths(old)
-      dirs.reverse.each do |directory|
-        if Dir.entries(directory).size == 2 # . と .. のみ
-          puts "  remove directory: #{directory}" unless @options[:quiet]
-          Dir.rmdir(directory)
-        end
+      old_dir = File.dirname(new)
+      if Dir.entries(old_dir).size == 2 # . と .. のみ
+        puts "  remove directory: #{old_dir}" unless @options[:quiet]
+        Dir.rmdir_p(old_dir)
       end
     end
 
