@@ -23,7 +23,6 @@ module FileRenamer
 end
 
 class TC_Commander < Test::Unit::TestCase
-  EXIST_FILE = "test/filerenamer/dummy.txt"
 
   A_0 = "test/filerenamer/a0.txt"
   A_1 = "test/filerenamer/a1.txt"
@@ -247,32 +246,61 @@ class TC_Commander < Test::Unit::TestCase
   end
 
   def test_check_new_names
-    files = {
-      "alice.txt"   => EXIST_FILE,
-      "bcdefgh.txt" => EXIST_FILE,
-      "charly.txt"  => "C.txt",
-      "david.txt"   => "D.txt",
-      EXIST_FILE    => EXIST_FILE,
-      "eva.txt"     => "alice.txt",
-      "f.txt"       => "f.txt",
-      "g.txt"       => nil,
-    }
-    ok_list, ng_list = @fr00.check_new_names(files)
-    assert_equal(
-      { "charly.txt"  => "C.txt",
-        "david.txt"   => "D.txt",
-      },
-      ok_list
-    )
-    assert_equal(
-      { "alice.txt"   => EXIST_FILE,
-        "bcdefgh.txt" => EXIST_FILE,
-        EXIST_FILE    => EXIST_FILE,
-        "eva.txt"     => "alice.txt",
-      },
-      ng_list
-    )
+    #exist_file = "test/filerenamer/dummy.txt"
+    #files = {
+    #  "alice.txt"   => exist_file,
+    #  "bcdefgh.txt" => exist_file,
+    #  "charly.txt"  => "C.txt",
+    #  "david.txt"   => "D.txt",
+    #  exist_file    => exist_file,
+    #  "eva.txt"     => "alice.txt",
+    #  "f.txt"       => "f.txt",
+    #  "g.txt"       => nil,
+    #}
+    #ok_list, ng_list = @fr00.check_new_names(files)
+    #assert_equal(
+    #  { "charly.txt"  => "C.txt",
+    #    "david.txt"   => "D.txt",
+    #  },
+    #  ok_list
+    #)
+    #assert_equal(
+    #  { "alice.txt"   => exist_file,
+    #    "bcdefgh.txt" => exist_file,
+    #    exist_file    => exist_file,
+    #    "eva.txt"     => "alice.txt",
+    #  },
+    #  ng_list
+    #)
 
+    a_file = "test/commander/a.file" #exist
+    b_file = "test/commander/b.file" #exist
+    c_file = "test/commander/c.file" #not exist
+    d_file = "test/commander/d.file" #not exist
+
+    # 変化なし
+    files = { "a.file" => 'a.file', "b.file" => 'b.file', }
+    ok_list, ng_list = @fr00.check_new_names(files)
+    assert_equal( {}, ok_list)
+    assert_equal( {}, ng_list)
+
+    # 相互入れ替え
+    files = { "a.file" => 'b.file', "b.file" => 'a.file', }
+    ok_list, ng_list = @fr00.check_new_names(files)
+    assert_equal( files, ok_list)
+    assert_equal( {}   , ng_list)
+
+    # 宛先が重複
+    files = { "a.file" => 'c.file', "b.file" => 'c.file', }
+    ok_list, ng_list = @fr00.check_new_names(files)
+    assert_equal( {}   , ok_list)
+    assert_equal( files, ng_list)
+
+    # 玉突き
+    files = { "a.file" => 'b.file', "b.file" => 'c.file', }
+    ok_list, ng_list = @fr00.check_new_names(files)
+    assert_equal( files, ok_list)
+    assert_equal( {}   , ng_list)
   end
 
   def test_ask_yes?

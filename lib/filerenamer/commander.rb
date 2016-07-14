@@ -1,14 +1,14 @@
 #! /usr/bin/env ruby
 # coding: utf-8
 
-require "rubygems"
-gem "builtinextension"
-require "string/escapezsh.rb"
-require "string/width.rb"
-
+#gem "builtinextension"
+require "filerenamer/optionparser.rb"
 require "fileutils"
 require "optparse"
-require "filerenamer/optionparser.rb"
+require "rubygems"
+require "string/escapezsh.rb"
+require "string/width.rb"
+require 'tmpdir'
 
 # ファイル群の名前変更を一括して行うためのクラス。
 # 他のアプリケーションからも使えるけれど、
@@ -29,7 +29,7 @@ require "filerenamer/optionparser.rb"
 # 途中まで変換してから interrupt されたときに
 # 中にあるファイルごと消される可能性がありそう。
 # そのため、メソッド内で自分で temporary directory を作成する。
-# 
+#
 # 没案
 #   rename_rule メソッドをデフォルトで例外にしておいて、
 #   コマンドスクリプト側で定義するという方法は、
@@ -61,15 +61,14 @@ module FileRenamer
       @options = options
 
       if (@options[:yes] && @options[:no])
-        raise OptionError,
-          "Conflict options: --yes and --no."
+        raise OptionError, "Conflict options: --yes and --no."
       end
 
       fileProcessModes = []
       [:move, :copy, :hardlink, :symlink, :git].each do |mode|
         fileProcessModes << mode if @options[mode]
       end
-      # 1つもなければ :move に。
+      # mode が1つもなければ :move に。
       @options[:move] = true if fileProcessModes == []
       # 2つ以上あれば例外。
       if fileProcessModes.size > 1
@@ -82,13 +81,10 @@ module FileRenamer
       @command = "ln -s"  if @options[:symlink]
       @command = "git mv" if @options[:git]
 
-      # :quiet ならば自動的に :yes
-      @options[:yes] = true if @options[:quiet]
+      @options[:yes] = true if @options[:quiet] # :quiet ならば自動的に :yes
 
-      # :quiet と同時に :no なら例外
-      if @options[:quiet] && @options[:no]
-        raise OptionError,
-          "Conflict options: --quiet and --no"
+      if @options[:quiet] && @options[:no] # :quiet と同時に :no なら例外
+        raise OptionError, "Conflict options: --quiet and --no"
       end
 
       @files = self.class.files(files)
@@ -105,34 +101,13 @@ module FileRenamer
 
       ok_files, ng_files = check_new_names(new_names)
 
-      unless @options[:quiet]
-        if ok_files.size > 0
-          puts "Enable files:"
-          max_width = ok_files.keys.max_by{|file| file.width}.width
-          ok_files.keys.sort.each do |old|
-            printf("  %s %s%s %s\n",
-              @command, old, " " * (max_width - old.width), ok_files[old]
-            )
-          end
-        end
+      show_conversions(ok_files, "Enable files:")
+      show_conversions(ng_files, "Unable files:")
 
-        if ng_files.size > 0
-          puts "Unable files:"
-          max_width = ng_files.keys.max_by{|file| file.width}.width
-          ng_files.keys.sort.each do |old|
-            printf("  %s %s%s %s\n",
-              @command, old, " " * (max_width - old.width), ng_files[old]
-            )
-          end
-        puts
-        end
-      end
+      (puts "Execute? no"; return) if @options[:no]
 
       if ok_files.empty?
         puts "Done. No executable files." unless @options[:quiet]
-        return
-      elsif @options[:no]
-        puts "Execute? no"
         return
       end
 
@@ -141,15 +116,26 @@ module FileRenamer
       elsif (! ask_yes?)
         return
       end
-      ok_files.each do |old, new|
-        run(old, new)
-      end
+
+      rename( ok_files)
     end
 
     private
 
+    def show_conversions(conversions, heading)
+      return if conversions.size == 0
+      return if @options[:quiet]
+      puts heading
+      max_width = conversions.keys.max_by{|file| file.width}.width
+      conversions.keys.sort.each do |old|
+        printf("  %s %s%s %s\n",
+          @command, old, " " * (max_width - old.width), conversions[old]
+        )
+      end
+      puts
+    end
+
     def make_new_names(&block)
-      #pp @files
       results = {}
       @files.each { |i| results[i] = yield i }
       return results
@@ -158,52 +144,30 @@ module FileRenamer
     # 新しい名前リストを受け取り、問題なくリネームできるものと
     # できないものを選別する。
     # OK, NG の順に2つの配列を返す。
-    #
-    # 判断基準は、以下の AND 条件。
-    #   - 新しい名前が古い名前リストに含まれないこと。
-    #   - 新しい名前が新しい名前リストに1つ(自分)のみしかないこと。
-    #   - 新しい名前のファイルが既に存在しないこと。
-    #
-    # 没案
-    #   新しい名前が変換されない古い名前であれば、
-    #   これも NG リストに追加する。(表示用)
-    #   このルールにすると、変換に順序依存が生じる可能性があり、
-    #   temporary directory を経由する必要ができる。
-    #   その結果、リネーム過程で深い temporary directory を
-    #   作成したり削除したりしなければならなくなる。
+    #def ok_new_names(old_new_hash)
+    #end
+    #def ng_new_names(old_new_hash)
     def check_new_names(old_new_hash)
       ok_files = {}
       ng_files = {}
 
       old_new_hash.each do |old, new|
-        # 変化がない場合はスルー
-        next if old == new
+        next if old == new # 変化がない場合は無視
+        next if new == nil # 新しい名前に nil が定義されていたら無視
 
-        # 新しい名前に nil が定義されていてもスルー
-        next if new == nil
-
-        # 既に存在していれば、既に存在するファイルごと NG に登録。
-        if FileTest.exist?(new)
-          ng_files[old] = new
-          ng_files[new] = new
-          next
-        end
-
-        # new が複数 重複していれば、 NG。
+        #宛先が、宛先リスト内で重複していると、NG リスト入り
         if (old_new_hash.values.select{|name| name == new}.size > 1)
           ng_files[old] = new
           next
         end
 
-        # new が old に含まれていれば、NG。
-        if (old_new_hash.keys.include?(new))
+        # 宛先パスにファイルが既存、かつ、元ファイル名リストに含まれていなければ、NG
+        if FileTest.exist?(new) && ! old_new_hash.keys.include?(new)
           ng_files[old] = new
           next
         end
 
-        # 上記以外の場合ならば OK
-
-        ok_files[old] = new
+        ok_files[old] = new # 上記以外の場合ならば OK
       end
       return ok_files, ng_files
     end
@@ -214,8 +178,7 @@ module FileRenamer
     # それ以外なら false を返す。
     def ask_yes?
       puts "Execute?"
-      str = $stdin.gets
-      if /^y/i =~ str
+      if /^y/i =~ $stdin.gets
         return true
       else
         return false
@@ -224,13 +187,31 @@ module FileRenamer
 
     # コマンドを表示しつつ実行。
     # 既にファイルチェックされているはずなので、チェックはしない。
-    # 少なくとも当面は。
-    # ディレクトリが必要ならここで作成。
+    # ディレクトリが必要になればここで作成。
     # ディレクトリが不要になればここで削除。
     # 本来ここでない方が分かり易い気もするのだが、ここに追加するのが一番簡単なので。
-    def run(old, new)
+    #def run(old, new)
+    def rename(conversions)
+
+      #pp Dir.tmpdir
+      Dir.mktmpdir do |tmpdir|
+        tmpdir
+
+      end
+
+      tempdir パス取得
+      tempdir さくせい
+      conversions.keys をすべて、パスのディレクトリ構成を維持したまま tempdir するための
+      int_paths を生成
+
+      int_paths にしたがって tempdir に移動
+      int_paths から conversions.values にしたがって、移動
+
+
+      conversions.each { |old, new| run(old, new) }
+
+
       # 変換先のディレクトリがなければ生成
-      #pp old, new; exit
       paths(new).each do |directory|
         unless FileTest.exist?(directory)
           puts "  make directory: #{directory}" unless @options[:quiet]
