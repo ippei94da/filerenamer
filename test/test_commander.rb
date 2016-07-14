@@ -15,9 +15,9 @@ module FileRenamer
   class Commander
     public :check_new_names
     public :ask_yes?
-    public :run
     public :make_new_names
     public :paths
+    public :transplant
     attr_reader :options
   end
 end
@@ -393,7 +393,7 @@ class TC_Commander < Test::Unit::TestCase
     tgt_dir = "test/commander/d"
     tgt_file1 = "#{tgt_dir}/1.file"
     tgt_file2 = "#{tgt_dir}/2.file"
-    Dir.mkdir_p src_dir
+    FileUtils.mkdir_p src_dir
     File.open(src_file1, 'w').close
     File.open(src_file2, 'w').close
 

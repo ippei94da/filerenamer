@@ -220,7 +220,7 @@ module FileRenamer
       old_dir = File.dirname(new)
       if Dir.entries(old_dir).size == 2 # . と .. のみ
         puts "  remove directory: #{old_dir}" unless @options[:quiet]
-        Dir.rmdir_p(old_dir)
+        FileUtils.rmdir_p(old_dir)
       end
     end
 
