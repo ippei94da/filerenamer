@@ -18,6 +18,7 @@ module FileRenamer
     public :make_new_names
     public :paths
     public :transplant
+    public :rmdir_p
     attr_reader :options
   end
 end
@@ -386,17 +387,23 @@ class TC_Commander < Test::Unit::TestCase
   end
 
   def test_transplant
-    src_root_dir = "test/commander"
+    src_root_dir = "test/commander/transplant"
     src_dir   = "#{src_root_dir}/a/b/c"
     src_file1 = "#{src_dir}/1.file"
     src_file2 = "#{src_dir}/2.file"
-    tgt_dir = "test/commander/d"
+    tgt_dir = "test/commander/transplant/d"
     tgt_file1 = "#{tgt_dir}/1.file"
     tgt_file2 = "#{tgt_dir}/2.file"
+
+    FileUtils.rm_rf([src_root_dir, tgt_dir])
+
     FileUtils.mkdir_p src_dir
     File.open(src_file1, 'w').close
     File.open(src_file2, 'w').close
 
+
+    #pp src_file1, tgt_file1
+    #pp src_path, tgt_path;exit
     @fr00.transplant(src_file1, tgt_file1)
     assert_equal(false, FileTest.exist?(src_file1))
     assert_equal(true , FileTest.exist?(src_file2))
@@ -417,5 +424,27 @@ class TC_Commander < Test::Unit::TestCase
     assert_equal([], @fr00.paths("baz.txt"))
     assert_equal(["/foo", "/foo/bar"], @fr00.paths("/foo/bar/baz.txt"))
   end
+
+  def test_rmdir_p
+    root_dir = 'test/commander/rmdir_p'
+    dir = root_dir + '/a/b/c'
+    FileUtils.rm_rf dir
+    FileUtils.mkdir_p dir
+    file = dir + '/file'
+    File.open(file, 'w').close
+
+    @fr00.rmdir_p(dir)
+    assert_equal(true, (FileTest.directory? dir))
+
+    FileUtils.rm(file)
+    @fr00.rmdir_p(dir)
+    assert_equal(false, (FileTest.directory? root_dir))
+
+    #teardown
+    FileUtils.rm_rf dir
+  end
+
+  undef test_execute
+  undef test_rename
 end
 
