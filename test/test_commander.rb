@@ -19,6 +19,7 @@ module FileRenamer
     public :paths
     public :transplant
     public :rmdir_p
+    public :convert
     attr_reader :options
   end
 end
@@ -144,7 +145,6 @@ class TC_Commander < Test::Unit::TestCase
 
     #:quiet
     FileUtils.rm(A_1) if FileTest.exist?(A_1)
-    io = StringIO.new
     #
     options = {:copy => true, :quiet => true}
     fr01 = FileRenamer::Commander.new(options, [A_0])
@@ -233,7 +233,6 @@ class TC_Commander < Test::Unit::TestCase
 
   def test_make_new_names
     options = {}
-    #pp [A_0, A_1]; exit
     fr00 = FileRenamer::Commander.new(options, [A_0, A_1])
     assert_equal(
       {
@@ -274,10 +273,10 @@ class TC_Commander < Test::Unit::TestCase
     #  ng_list
     #)
 
-    a_file = "test/commander/a.file" #exist
-    b_file = "test/commander/b.file" #exist
-    c_file = "test/commander/c.file" #not exist
-    d_file = "test/commander/d.file" #not exist
+    #a_file = "test/commander/a.file" #exist
+    #b_file = "test/commander/b.file" #exist
+    #c_file = "test/commander/c.file" #not exist
+    #d_file = "test/commander/d.file" #not exist
 
     # 変化なし
     files = { "a.file" => 'a.file', "b.file" => 'b.file', }
@@ -350,40 +349,24 @@ class TC_Commander < Test::Unit::TestCase
     assert_equal(false, result)
   end
 
-  def test_rename
-    TODO
-    # ディレクトリ消去が必要な場合
-    FileUtils.rm("tmp1/dir/a1.txt") if FileTest.exist?("tmp1/dir/a1.txt")
-    FileUtils.rm("tmp2/dir/a1.txt") if FileTest.exist?("tmp2/dir/a1.txt")
-    FileUtils.rmdir("tmp1/dir") if FileTest.exist?("tmp1")
-    FileUtils.rmdir("tmp2/dir") if FileTest.exist?("tmp2")
-    FileUtils.rmdir("tmp1") if FileTest.exist?("tmp1")
-    FileUtils.rmdir("tmp2") if FileTest.exist?("tmp2")
-    #
-    FileUtils.mkdir("tmp1")
-    FileUtils.mkdir("tmp1/dir")
-    FileUtils.cp(A_0, "tmp1/dir/a1.txt")
-    #
-    assert_equal(false, FileTest.exist?("tmp2/dir/a2")) #実行前に変換先が存在しないことを確認。
-    #@fr00.run("tmp1/dir/a1.txt", "tmp2/dir/a1.txt")
-    str = capture_stdout{ @fr00.run("tmp1/dir/a1.txt", "tmp2/dir/a1.txt") }
-    t = str
-    correct = "  make directory: tmp2\n" +
-      "  make directory: tmp2/dir\n" +
-      "  mv tmp1/dir/a1.txt tmp2/dir/a1.txt\n" +
-      "  remove directory: tmp1/dir\n" +
-      "  remove directory: tmp1\n"
-    assert_equal(correct, t)
-    #
-    assert_equal(false, FileTest.exist?("tmp1"))
-    assert_equal(true , FileTest.exist?("tmp2/dir/a1.txt")) #実行後に変換先が存在することを確認。
-    #
-    # あとかたづけ
-    FileUtils.rmdir("tmp1/dir")
-    FileUtils.rmdir("tmp1")
-    FileUtils.rm("tmp2/dir/a1.txt")
-    FileUtils.rmdir("tmp2/dir")
-    FileUtils.rmdir("tmp2")
+  def test_convert
+    root_dir = 'test/commander/convert'
+    FileUtils.rm_rf root_dir
+
+    a0 = "#{root_dir}/a0.file"
+    FileUtils.mkdir_p(File.dirname a0)
+    File.open(a0, 'w').close
+
+    a1 = "#{root_dir}/a1.file"
+    FileUtils.mkdir_p(File.dirname a1)
+    File.open(a1, 'w').close
+
+    assert_equal(true , FileTest.exist?(a0))
+    @fr00.convert({a0 => a1})
+    assert_equal(false, FileTest.exist?(a0))
+    assert_equal(true , FileTest.exist?(a1))
+
+    FileUtils.rm_rf root_dir
   end
 
   def test_transplant
@@ -402,8 +385,6 @@ class TC_Commander < Test::Unit::TestCase
     File.open(src_file2, 'w').close
 
 
-    #pp src_file1, tgt_file1
-    #pp src_path, tgt_path;exit
     @fr00.transplant(src_file1, tgt_file1)
     assert_equal(false, FileTest.exist?(src_file1))
     assert_equal(true , FileTest.exist?(src_file2))
@@ -415,8 +396,9 @@ class TC_Commander < Test::Unit::TestCase
     assert_equal(false, FileTest.exist?(src_file2))
     assert_equal(true , FileTest.exist?(tgt_file1))
     assert_equal(true , FileTest.exist?(tgt_file2))
+    assert_equal(false, FileTest.exist?(src_root_dir + '/a'))
 
-    assert_equal(false, FileTest.exist?(src_root_dir))
+    FileUtils.rm_rf(src_root_dir)
   end
 
   def test_paths
@@ -443,8 +425,5 @@ class TC_Commander < Test::Unit::TestCase
     #teardown
     FileUtils.rm_rf dir
   end
-
-  undef test_execute
-  undef test_rename
 end
 

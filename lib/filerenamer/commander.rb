@@ -9,6 +9,7 @@ require "rubygems"
 require "string/escapezsh.rb"
 require "string/width.rb"
 require 'tmpdir'
+require 'pathname'
 
 # ファイル群の名前変更を一括して行うためのクラス。
 # 他のアプリケーションからも使えるけれど、
@@ -92,7 +93,6 @@ class FileRenamer::Commander
   # 変更される名前のリストを表示し、ユーザの指示に従って実行する。
   # ユーザの入力は [y|Y] で始まる文字列ならば実行、
   # それ以外なら実行しない。
-  # files は対象のファイル名のリスト。
   # 新しい名前の生成方法をブロックで渡す。
   # ブロックがなければ例外 FileRenamerNoRenameRuleError
   def execute(&block)
@@ -116,7 +116,7 @@ class FileRenamer::Commander
       return
     end
 
-    rename( ok_files)
+    convert( ok_files)
   end
 
   private
@@ -188,18 +188,16 @@ class FileRenamer::Commander
   # 既にファイルチェックされているはずなので、チェックはしない。
   # ディレクトリが必要になればここで作成。
   # ディレクトリが不要になればここで削除。
-  # 本来ここでない方が分かり易い気もするのだが、ここに追加するのが一番簡単なので。
-  #def run(old, new)
-  def rename(conversions)
-
+  def convert(conversions)
     tmpdir = Dir.mktmpdir('rename', './')
 
     int_paths = {} #intermediate paths
     conversions.each { |old, new| int_paths[old] = tmpdir + '/' + old }
     int_paths.each   { |old, int| transplant(old, int) }
-    conversions.each { |old, new| transplant(int_paths[old], new) }
+    int_paths.each   { |old, int| rmdir_p old }
 
-    Dir.rmdir tmpdir
+    conversions.each { |old, new| transplant(int_paths[old], new) }
+    int_paths.each   { |old, int| rmdir_p int }
   end
 
   # Move from root to root.
@@ -209,22 +207,22 @@ class FileRenamer::Commander
     # 変換先のディレクトリがなければ生成
     tgt_dir = File.dirname(tgt_path)
     unless FileTest.exist?(tgt_dir)
-      puts "  make directory: #{tgt_dir}" unless @options[:quiet]
+      #puts "  make directory: #{tgt_dir}" unless @options[:quiet]
       FileUtils.mkdir_p(tgt_dir)
     end
 
     # 変換の実行
     command = "  #{@command} #{src_path.escape_zsh} #{tgt_path.escape_zsh}"
-    puts command unless @options[:quiet]
+    #puts command unless @options[:quiet]
     system(command)
 
-    #STDIN.gets
+    ##STDIN.gets
     # 変換元のディレクトリが空になっていれば削除
     src_dir = File.dirname(src_path)
     #pp Dir.entries(src_dir)
     if Dir.entries(src_dir).size == 2 # . と .. のみ
-      puts "  remove directory: #{src_dir}" unless @options[:quiet]
-      FileUtils.rmdir(src_dir)
+      #puts "  remove directory: #{src_dir}" unless @options[:quiet]
+      rmdir_p(src_dir)
     end
   end
 
@@ -246,7 +244,7 @@ class FileRenamer::Commander
     Pathname.new(path).ascend do |p_path|
       begin
         Dir.rmdir p_path
-      rescue Errno::ENOTEMPTY
+      rescue
         break
       end
     end
