@@ -98,6 +98,8 @@ class FileRenamer::Commander
   def execute(&block)
     new_names = make_new_names(&block)
 
+    ## Use RenameOrderer
+
     ok_files, ng_files = check_new_names(new_names)
 
     show_conversions(ok_files, "Enable files:")
