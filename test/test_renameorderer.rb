@@ -6,37 +6,105 @@ require "helper"
 #require "test/unit"
 #require "pkg/klass.rb"
 
+pp "old ファイルが存在しなければ unable"
+pp "old に重複があれば、例外"
+
 class TC_RenameOrderer < Test::Unit::TestCase
-  def setup
-    @ro0 = RenameOrderer.new([ %w(00 01), %w(10 11), ]) # independent
-    @ro1 = RenameOrderer.new([ %w(01 02), %w(00 01), ]) # dependent
-    @ro2 = RenameOrderer.new([ %w(00 01), %w(10 01), ]) # dup target
-    @ro3 = RenameOrderer.new([ %w(00 01), %w(01 00), ]) # swap (circular when 2)
-    @ro4 = RenameOrderer.new([ %w(00 01), %w(01 02), %w(02 00) ]) # circular
-    @ro5 = RenameOrderer.new([ %w(00 01), %w(01 02), %w(02 00), %w(03 00) ]) # circular adding depend
-    @ro6 = RenameOrderer.new([ %w(00 01), %w(10 01), %w(02 03) ]) # dup target and independent
 
+  D01   = 'test/renameorderer/01'
+  D012  = 'test/renameorderer/012'
+  D0123 = 'test/renameorderer/0123'
+  D02   = 'test/renameorderer/02'
+
+  # independent
+  def test_00
+    ro = FileRenamer::RenameOrderer.new([ %w(0 1), %w(2 3), ], D02)
+    assert_equal([ %w(0 1), %w(2 3), ], ro.rename_processes)
+    assert_equal([                   ], ro.unable_processes)
   end
 
-  def test_rename_order
-    assert_equal([ %w(00 01), %w(10 11), ], @ro0.rename_order)
-    assert_equal([ %w(01 02), %w(00 01), ], @ro1.rename_order)
-    assert_equal([                       ], @ro2.rename_order)
-    assert_equal([ %w(00 tmp), %w(01 00), %w(tmp 01)], @ro3.rename_order)
-    assert_equal([ %w(00 tmp), %w(02 00), %w(01 02), %w(00 01), %w(tmp 02)], @ro4.rename_order)
-    assert_equal([                       ], @ro5.rename_order)
-    assert_equal([                       ], @ro6.rename_order)
+  # dependent
+  def test_01
+    ro  = FileRenamer::RenameOrderer.new([ %w(0 1), %w(1 2), ], D01)
+    assert_equal([ %w(1 2), %w(0 1), ], ro.rename_processes)
+    assert_equal([                   ], ro.unable_processes)
   end
 
-  def test_unable_list
-    assert_equal([                       ], @ro0.unable_list)
-    assert_equal([                       ], @ro1.unable_list)
-    assert_equal([ %w(00 01), %w(10 01), ], @ro2.unable_list)
-    assert_equal([                       ], @ro3.unable_list)
-    assert_equal([                       ], @ro4.unable_list)
-    assert_equal([ %w(00 01), %w(01 02), %w(02 00), %w(03 00) ], @ro5.unable_list)
-    assert_equal([ %w(00 01), %w(10 01), %w(02 03) ], @ro6.unable_list)
+  # dependent
+  def test_02
+    ro = FileRenamer::RenameOrderer.new([ %w(1 2), %w(0 1), ], D01)
+    assert_equal([ %w(1 2), %w(0 1), ], ro.rename_processes)
+    assert_equal([                   ], ro.unable_processes)
   end
 
+  # dup target
+  def test_03
+    ro = FileRenamer::RenameOrderer.new([ %w(0 1), %w(2 1), ], D02)
+    assert_equal([                   ], ro.rename_processes)
+    assert_equal([ %w(0 1), %w(2 1), ], ro.unable_processes)
+  end
+
+  # swap (circular when 2)
+  def test_04
+    ro = FileRenamer::RenameOrderer.new([ %w(0 1), %w(1 0), ], D01)
+    #assert_equal([ %w(0 0tmp), %w(1 0), %w(0tmp 1)], ro.rename_processes)
+    results = ro.rename_processes
+    assert_equal('0', results[0][0])
+    assert(/^test/ =~ results[0][1])
+    assert_equal('1', results[1][0])
+    assert_equal('0', results[1][1])
+    assert(/^test/ =~ results[2][0])
+    assert_equal('1', results[2][1])
+
+    assert_equal([], ro.unable_processes)
+  end
+
+  # circular
+  def test_05
+    ro = FileRenamer::RenameOrderer.new([ %w(0 1), %w(1 2), %w(2 0) ], D012)
+    results = ro.rename_processes
+    #pp results
+    #assert_equal([ %w(0 0tmp), %w(2 0), %w(1 2), %w(0 1), %w(0tmp 2)], ro.rename_processes)
+    assert_equal('0', results[0][0])
+    assert(/^test/ =~ results[0][1])
+    assert_equal('2', results[1][0])
+    assert_equal('0', results[1][1])
+    assert_equal('1', results[2][0])
+    assert_equal('2', results[2][1])
+    assert(/^test/ =~ results[3][0])
+    assert_equal('1', results[3][1])
+
+    assert_equal([                                                  ], ro.unable_processes)
+  end
+
+  # circular adding depend
+  def test_06
+    ro = FileRenamer::RenameOrderer.new([ %w(0 1), %w(1 2), %w(2 0), %w(3 0) ], D0123)
+    assert_equal([                                    ], ro.rename_processes)
+    assert_equal([ %w(0 1), %w(1 2), %w(2 0), %w(3 0) ], ro.unable_processes)
+  end
+
+  # dup target and independent
+  def test_07
+    ro = FileRenamer::RenameOrderer.new([ %w(0 3), %w(1 3), %w(2 4) ], D012)
+    assert_equal([ %w(2 4)         ], ro.rename_processes)
+    assert_equal([ %w(0 3), %w(1 3)], ro.unable_processes)
+  end
+
+  #def test_08
+  #  ro = FileRenamer::RenameOrderer.new([ %w(0 1), %w(2 3), ], D01)
+  #  assert_equal([ %w(0 1)], ro.rename_processes)
+  #  assert_equal([ %w(2 3)], ro.unable_processes)
+  #end
+
+
+  #undef test_00
+  #undef test_01
+  #undef test_02
+  #undef test_03
+  #undef test_04
+  #undef test_05
+  #undef test_06
+  #undef test_07
 end
 
