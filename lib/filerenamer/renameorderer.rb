@@ -25,16 +25,15 @@ class FileRenamer::RenameOrderer
     @rename_processes = []
     @unable_processes = []
 
+    @post_processes = []
     while ! @unworked_processes.empty?
       key = @unworked_processes.keys[0]
       @first_old = key
-      @post_processes = []
       class_process(key)
-      @rename_processes += @post_processes if @post_processes
-      @post_processes = []
     end
+    @rename_processes += @post_processes unless @post_processes.empty?
+    @post_processes = []
 
-    #pp @unable_processes
     @unable_processes.sort!
   end
 
@@ -46,7 +45,6 @@ class FileRenamer::RenameOrderer
   def class_process(old)
 
     new = @unworked_processes[old]
-    #@unworked_processes.delete(old)
 
     if $DEBUG
       puts "=" * 60
@@ -61,7 +59,6 @@ class FileRenamer::RenameOrderer
     # old と new が一致していれば不可
     if old == new
       puts "old(#{old}) == new(#{new}). retrun false." if $DEBUG
-      #@unable_processes << [old, new]
       add_unable(old, new)
       return false
     end
@@ -70,7 +67,6 @@ class FileRenamer::RenameOrderer
     # old が存在しなければ不可
     unless FileTest.exist?("#{@dir}/#{old}")
       puts "old(#{old}) not exist in the file system. return false." if $DEBUG
-      #@unable_processes << [old, new]
       add_unable(old, new)
       return false
     end
@@ -79,7 +75,6 @@ class FileRenamer::RenameOrderer
     # new がどれかの dst と重複ならば、不可
     if @all_processes.values.select{|name| new == name}.size > 1
       puts "new(#{new}) is dpulicated in #{@all_processes.values}. return false." if $DEBUG
-      #@unable_processes << [old, new]
       add_unable(old, new)
       return false
     end
@@ -87,7 +82,6 @@ class FileRenamer::RenameOrderer
 
     unless File.exist?("#{@dir}/#{new}") # new がファイルとして存在しないならば、可能
       puts "new(#{new}) does not exist in the filesystem. return true." if $DEBUG
-      #@rename_processes << [old, new]
       add_rename(old, new)
       return true
     end
@@ -98,7 +92,6 @@ class FileRenamer::RenameOrderer
     # 可能リストに入っていたら、ここまでにリネームされているので可能
     if @rename_processes.map{|o, n| o}.include?(new)
       puts "new(#{new}) is included in old of @rename_processes(#{@rename_processeses}). return true." if $DEBUG
-      #@rename_processes << [old, new]
       add_rename(old, new)
       return true
     end
@@ -106,7 +99,6 @@ class FileRenamer::RenameOrderer
     # new が、他のいずれかの process の old で ない ならば、空かないので不可
     unless @unworked_processes[new]
       puts "@unworked_processes[new](#{@unworked_processes[new] }). return false." if $DEBUG
-      #@unable_processes << [old, new]
       add_unable(old, new)
       return false
     end
@@ -118,24 +110,26 @@ class FileRenamer::RenameOrderer
     # 最後に一時ファイルからリネームする処理を追加。
     if new == @first_old
       puts "new #{new} == first_old #{@first_old}. use tmp file and return true." if $DEBUG
-      tmp = Tempfile.new("#{@first_old}-", @dir).path
-      @rename_processes << [@first_old, tmp]
-      add_rename( old, new)
+      #tmp = Tempfile.new("#{@first_old}-", @dir).path
+      tmp = Tempfile.new("#{@all_processes[@first_old]}-#{@first_old}-", @dir).path
+      add_rename(@first_old, tmp)
       @post_processes << [tmp, @all_processes[@first_old]]
+      pp self if $DEBUG
       return true
     end
     puts "new(#{new}) != first_old(#{@first_old})" if $DEBUG
 
     puts "class_process(new)" if $DEBUG
-    #ここでの new からリネームするプロセスについて、再帰的に実行し、
+    pp self if $DEBUG
+    #ここでの new からリネームするプロセスについて、再帰的に実行
     if class_process(new)
-      puts "depending process can be done. return true." if $DEBUG
-      #@rename_processes << [old, new] unless @rename_processes.map{|o, n| o}.include?(old)
-      add_rename(old, new) unless @rename_processes.map{|o, n| o}.include?(old)
+      pp self if $DEBUG
+      puts "depending process can be executed. return true." if $DEBUG
+      #add_rename(old, new) unless @rename_processes.map{|o, n| o}.include?(old)
+      #add_rename(old, new)
       return true
     else
-      puts "depending process cannot be done. return false." if $DEBUG
-      #@unable_processes << [old, new]
+      puts "depending process cannot be executed. return false." if $DEBUG
       add_unable(old, new)
       return false
     end

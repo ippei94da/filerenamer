@@ -51,11 +51,10 @@ class TC_RenameOrderer < Test::Unit::TestCase
   def test_04
     ro = FileRenamer::RenameOrderer.new({'0' => '1', '1' => '0'}, D01)
     results = ro.rename_processes
-    #pp results
+    assert_equal(3, results.size)
     assert_equal('0', results[0][0])
     assert_equal('1', results[1][0])
     assert(/^test/ =~ results[2][0])
-
     assert(/^test/ =~ results[0][1])
     assert_equal('0', results[1][1])
     assert_equal('1', results[2][1])
@@ -67,13 +66,11 @@ class TC_RenameOrderer < Test::Unit::TestCase
   def test_05
     ro = FileRenamer::RenameOrderer.new({ '0' => '1', '1' => '2', '2' => '0'}, D012)
     results = ro.rename_processes
-
-    #pp results
+    assert_equal(4, results.size)
     assert_equal('0', results[0][0])
     assert_equal('2', results[1][0])
     assert_equal('1', results[2][0])
     assert(/^test/ =~ results[3][0])
-
     assert(/^test/ =~ results[0][1])
     assert_equal('0', results[1][1])
     assert_equal('2', results[2][1])
@@ -116,7 +113,7 @@ class TC_RenameOrderer < Test::Unit::TestCase
   #undef test_02
   #undef test_03
   #undef test_04
-  #undef test_05
+  ##undef test_05
   #undef test_06
   #undef test_07
   #undef test_08

@@ -19,8 +19,8 @@ op.on("-i num", "--initial", "Indicate initial number."){ |val|
 op.on("-p", "--preserve", "Preserve old name."){
   OPTIONS[:preserve] = true
 }
-op.on("-r", "--random", "Random number."){
-  OPTIONS[:random] = true
+op.on("--shuffle", "Shuffle number."){
+  OPTIONS[:shuffle] = true
 }
 op.parse!(ARGV)
 
@@ -30,7 +30,7 @@ files = FileRenamer::Commander.files(ARGV)
 last_number = OPTIONS[:init].to_i +  files.size - 1
 width = last_number.to_s.size
 
-files.shuffle!  if OPTIONS[:random]
+files.shuffle!  if OPTIONS[:shuffle]
 
 fr = FileRenamer::Commander.new(op.options, files)
 
