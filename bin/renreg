@@ -1,8 +1,9 @@
 #! /usr/bin/env ruby
 # coding: utf-8
 
-require "filerenamer/commander.rb"
-require "filerenamer/optionparser.rb"
+require "filerenamer.rb"
+#require "filerenamer/commander.rb"
+#require "filerenamer/optionparser.rb"
 
 op = FileRenamer::OptionParser.new
 op.parse!(ARGV)

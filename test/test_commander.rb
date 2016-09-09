@@ -13,7 +13,7 @@ require "capture_stdout"
 
 module FileRenamer
   class Commander
-    public :check_new_names
+    #public :check_new_names
     public :ask_yes?
     public :make_new_names
     public :paths
@@ -278,29 +278,29 @@ class TC_Commander < Test::Unit::TestCase
     #c_file = "test/commander/c.file" #not exist
     #d_file = "test/commander/d.file" #not exist
 
-    # 変化なし
-    files = { "a.file" => 'a.file', "b.file" => 'b.file', }
-    ok_list, ng_list = @fr00.check_new_names(files)
-    assert_equal( {}, ok_list)
-    assert_equal( {}, ng_list)
+    ## 変化なし
+    #files = { "a.file" => 'a.file', "b.file" => 'b.file', }
+    #ok_list, ng_list = @fr00.check_new_names(files)
+    #assert_equal( {}, ok_list)
+    #assert_equal( {}, ng_list)
 
-    # 相互入れ替え
-    files = { "a.file" => 'b.file', "b.file" => 'a.file', }
-    ok_list, ng_list = @fr00.check_new_names(files)
-    assert_equal( files, ok_list)
-    assert_equal( {}   , ng_list)
+    ## 相互入れ替え
+    #files = { "a.file" => 'b.file', "b.file" => 'a.file', }
+    #ok_list, ng_list = @fr00.check_new_names(files)
+    #assert_equal( files, ok_list)
+    #assert_equal( {}   , ng_list)
 
-    # 宛先が重複
-    files = { "a.file" => 'c.file', "b.file" => 'c.file', }
-    ok_list, ng_list = @fr00.check_new_names(files)
-    assert_equal( {}   , ok_list)
-    assert_equal( files, ng_list)
+    ## 宛先が重複
+    #files = { "a.file" => 'c.file', "b.file" => 'c.file', }
+    #ok_list, ng_list = @fr00.check_new_names(files)
+    #assert_equal( {}   , ok_list)
+    #assert_equal( files, ng_list)
 
-    # 玉突き
-    files = { "a.file" => 'b.file', "b.file" => 'c.file', }
-    ok_list, ng_list = @fr00.check_new_names(files)
-    assert_equal( files, ok_list)
-    assert_equal( {}   , ng_list)
+    ## 玉突き
+    #files = { "a.file" => 'b.file', "b.file" => 'c.file', }
+    #ok_list, ng_list = @fr00.check_new_names(files)
+    #assert_equal( files, ok_list)
+    #assert_equal( {}   , ng_list)
   end
 
   def test_ask_yes?

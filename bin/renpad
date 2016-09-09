@@ -4,8 +4,9 @@
 # Pad 0 onto the first numeric character series in filenames to become the same length.
 
 require "pp"
-require "filerenamer/commander.rb"
-require "filerenamer/optionparser.rb"
+require "filerenamer.rb"
+#require "filerenamer/commander.rb"
+#require "filerenamer/optionparser.rb"
 
 PATTERN = /^(\D*)(\d+)(.*)$/
 

@@ -11,8 +11,9 @@ require "rubygems"
 gem "builtinextension"
 require "string/splitparens.rb"
 
-require "filerenamer/commander.rb"
-require "filerenamer/optionparser.rb"
+require "filerenamer.rb"
+#require "filerenamer/commander.rb"
+#require "filerenamer/optionparser.rb"
 
 
 OPTIONS = {}

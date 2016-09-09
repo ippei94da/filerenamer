@@ -6,8 +6,9 @@
 # -i オプションで開始番号を指定
 # -p : preserve old name 元のファイル名を残す。foo.txt -> 001-foo.txt
 require 'pp'
-require 'filerenamer/commander.rb'
-require 'filerenamer/optionparser.rb'
+require "filerenamer.rb"
+#require 'filerenamer/commander.rb'
+#require 'filerenamer/optionparser.rb'
 
 
 OPTIONS = {}

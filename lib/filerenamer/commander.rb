@@ -41,8 +41,9 @@ require 'pathname'
 class FileRenamer::Commander
   attr_reader :files
 
-  class NoRenameRuleError < Exception; end
-  class OptionError < Exception; end
+  class NoRenameRuleError < StandardError; end
+  class OptionError < StandardError; end
+  class ModeError < StandardError; end
 
   def self.files(strs)
     if strs.empty?
@@ -75,11 +76,22 @@ class FileRenamer::Commander
       raise OptionError,
         "File process modes duplicate: #{fileProcessModes.join(", ")}"
     end
-    @command = "mv"     if @options[:move]
-    @command = "cp -r"  if @options[:copy]
-    @command = "ln"     if @options[:hardlink]
-    @command = "ln -s"  if @options[:symlink]
-    @command = "git mv" if @options[:git]
+
+    @mode = :move      if @options[:move]
+    @mode = :copy      if @options[:copy]
+    @mode = :hardlink  if @options[:hardlink]
+    @mode = :symlink   if @options[:symlink]
+    @mode = :git       if @options[:git]
+
+    case @mode
+    when :move     ; then;  @command = "mv"
+    when :copy     ; then;  @command = "cp -r"
+    when :hardlink ; then;  @command = "ln"
+    when :symlink  ; then;  @command = "ln -s"
+    when :git      ; then;  @command = "git mv"
+    else
+      raise ModeError, "Unknown mode: #{@mode}"
+    end
 
     @options[:yes] = true if @options[:quiet] # :quiet ならば自動的に :yes
 
@@ -98,9 +110,21 @@ class FileRenamer::Commander
   def execute(&block)
     new_names = make_new_names(&block)
 
-    ## Use RenameOrderer
-
-    ok_files, ng_files = check_new_names(new_names)
+    if @mode == :move || @mode == :git
+      ro = FileRenamer::RenameOrderer.new(new_names)
+      ok_files = ro.rename_processes
+      ng_files = ro.unable_processes
+    else
+      ok_files = []
+      ng_files = []
+      new_names.each do |old, new|
+        if File.exist? new
+          ng_files << [old, new]
+        else
+          ok_files << [old, new]
+        end
+      end
+    end
 
     show_conversions(ok_files, "Enable files:")
     show_conversions(ng_files, "Unable files:")
@@ -124,13 +148,14 @@ class FileRenamer::Commander
   private
 
   def show_conversions(conversions, heading)
+    #STDOUT.puts conversions
     return if conversions.size == 0
     return if @options[:quiet]
     puts heading
-    max_width = conversions.keys.max_by{|file| file.width}.width
-    conversions.keys.sort.each do |old|
+    max_width = conversions.max_by{|old, new| old.width}[0].width
+    conversions.each do |old, new|
       printf("  %s %s%s %s\n",
-        @command, old, " " * (max_width - old.width), conversions[old]
+        @command, old, " " * (max_width - old.width), new
       )
     end
     puts
@@ -142,36 +167,36 @@ class FileRenamer::Commander
     return results
   end
 
-  # 新しい名前リストを受け取り、問題なくリネームできるものと
-  # できないものを選別する。
-  # OK, NG の順に2つの配列を返す。
-  #def ok_new_names(old_new_hash)
+  ## 新しい名前リストを受け取り、問題なくリネームできるものと
+  ## できないものを選別する。
+  ## OK, NG の順に2つの配列を返す。
+  ##def ok_new_names(old_new_hash)
+  ##end
+  ##def ng_new_names(old_new_hash)
+  #def check_new_names(old_new_hash)
+  #  ok_files = {}
+  #  ng_files = {}
+
+  #  old_new_hash.each do |old, new|
+  #    next if old == new # 変化がない場合は無視
+  #    next if new == nil # 新しい名前に nil が定義されていたら無視
+
+  #    #宛先が、宛先リスト内で重複していると、NG リスト入り
+  #    if (old_new_hash.values.select{|name| name == new}.size > 1)
+  #      ng_files[old] = new
+  #      next
+  #    end
+
+  #    # 宛先パスにファイルが既存、かつ、元ファイル名リストに含まれていなければ、NG
+  #    if FileTest.exist?(new) && ! old_new_hash.keys.include?(new)
+  #      ng_files[old] = new
+  #      next
+  #    end
+
+  #    ok_files[old] = new # 上記以外の場合ならば OK
+  #  end
+  #  return ok_files, ng_files
   #end
-  #def ng_new_names(old_new_hash)
-  def check_new_names(old_new_hash)
-    ok_files = {}
-    ng_files = {}
-
-    old_new_hash.each do |old, new|
-      next if old == new # 変化がない場合は無視
-      next if new == nil # 新しい名前に nil が定義されていたら無視
-
-      #宛先が、宛先リスト内で重複していると、NG リスト入り
-      if (old_new_hash.values.select{|name| name == new}.size > 1)
-        ng_files[old] = new
-        next
-      end
-
-      # 宛先パスにファイルが既存、かつ、元ファイル名リストに含まれていなければ、NG
-      if FileTest.exist?(new) && ! old_new_hash.keys.include?(new)
-        ng_files[old] = new
-        next
-      end
-
-      ok_files[old] = new # 上記以外の場合ならば OK
-    end
-    return ok_files, ng_files
-  end
 
   # ユーザに判断を求める。
   # 標準入力から文字列を受け取り、
@@ -191,15 +216,16 @@ class FileRenamer::Commander
   # ディレクトリが必要になればここで作成。
   # ディレクトリが不要になればここで削除。
   def convert(conversions)
-    tmpdir = Dir.mktmpdir('rename', './')
+    #tmpdir = Dir.mktmpdir('rename', './')
 
-    int_paths = {} #intermediate paths
-    conversions.each { |old, new| int_paths[old] = tmpdir + '/' + old }
-    int_paths.each   { |old, int| transplant(old, int) }
-    int_paths.each   { |old, int| rmdir_p old }
+    #int_paths = {} #intermediate paths
+    #conversions.each { |old, new| int_paths[old] = tmpdir + '/' + old }
+    #conversions.each { |old, new| int_paths[old] = tmpdir + '/' + old }
+    #int_paths.each   { |old, int| transplant(old, int) }
+    #int_paths.each   { |old, int| rmdir_p old }
 
-    conversions.each { |old, new| transplant(int_paths[old], new) }
-    int_paths.each   { |old, int| rmdir_p int }
+    conversions.each { |old, new| transplant(old, new) }
+    #int_paths.each   { |old, int| rmdir_p int }
   end
 
   # Move from root to root.
