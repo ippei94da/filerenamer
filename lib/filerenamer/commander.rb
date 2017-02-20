@@ -127,7 +127,7 @@ class FileRenamer::Commander
     end
 
     show_conversions(ok_files, "Enable files:")
-    show_conversions(ng_files, "Unable files:")
+    #show_conversions(ng_files, "Unable files:")
 
     (puts "Execute? no"; return) if @options[:no]
 
