@@ -4,27 +4,35 @@
 require "pp"
 require "filerenamer.rb"
 require "optparse"
+require "exifr"
 
 ## option analysis
 OPTIONS = {}
-op = OptionParser.new
+op = FileRenamer::OptionParser.new
 #op.banner = [
 #    "Usage: #{File.basename("#{__FILE__}")}",
 #].join("\n")
-op.on("-p"    , "--preserve"    , "Preserve old name"){OPTIONS[:preserve] = true}
+op.on("-p", "--preserve", "preserve old name"){OPTIONS[:preserve] = true}
+op.on("-j", "--jpg" , "exif date_time_original from JPG"){OPTIONS[:jpg] = true}
+op.on("-t", "--tiff", "exif date_time_original from TIFF"){OPTIONS[:tiff] = true} # Canon CR2, Nikon NEF
+op.on("-s char", "--separator=char", "Separator like '/' in 'YY/MM/DD/'"){|v| OPTIONS[:separator] = v}
 op.parse!(ARGV)
-
-op = FileRenamer::OptionParser.new
-op.parse!(ARGV)
+s = OPTIONS[:separator]
 
 fr = FileRenamer::Commander.new(op.options, ARGV)
 fr.execute do |filename|
   extname = File.extname filename
   old_base = filename.sub(/#{extname}$/, "")
   dirname = File.dirname filename
-  date = File.mtime(filename)
+  if OPTIONS[:jpg]
+    date = EXIFR::JPEG.new(filename).date_time
+  elsif OPTIONS[:tiff]
+    date = EXIFR::TIFF.new(filename).date_time
+  else
+    date = File.mtime(filename)
+  end
 
-  new_basename = dirname + date.strftime("/%Y%m%d-%H%M%S")
+  new_basename = dirname + date.strftime("/%Y#{s.to_s}%m#{s.to_s}%d#{s || '-'}%H%M%S")
   new_basename += "-#{old_base}" if OPTIONS[:preserve]
   newname = new_basename + extname
   newname

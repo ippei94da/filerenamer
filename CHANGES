@@ -3,9 +3,12 @@
 <!-- Master -->
 
 
-依存性ちぇっく
+== Version 0.0.10 [2017-03-04] released
+
 * Add RenameOrderer, a smart dependency resolver of rename processes.
 * bin/rennum; --random option was renamed to --shuffle
+* bin/rentime --jpg
+* bin/rentime --tiff
 
 == Version 0.0.9 [2016-07-12] released
 
